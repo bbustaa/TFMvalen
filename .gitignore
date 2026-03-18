@@ -8,3 +8,6 @@ venv/
 *.log
 *.csv
 *.json
+
+# carpetas
+comprobaciones/
