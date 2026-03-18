@@ -65,19 +65,8 @@ def extraer_info_tls_por_frame(pcap_file):
 
 def contar_tls_records_por_conexion(pcap_file, client_ip):
     """
-    Cuenta estadísticas TLS por conexión en la que participa el cliente.
-
-    Para cada conexión calcula:
-    - incoming_records: número de TLS records que llegan al cliente
-    - outgoing_records: número de TLS records que salen del cliente
-    - total_tls_bytes: suma de los campos tls.record.length de todos los records
-
-    Args:
-        pcap_file (str): ruta al archivo .pcap
-        client_ip (str): IP del cliente que queremos tomar como referencia
-
-    Returns:
-        dict: diccionario indexado por conexión
+    Cuenta estadísticas TLS por conexión en la que participa el cliente --> incoming/outgoing tls records
+    y total de bytes TLS por conexión
     """
 
     stats = defaultdict(lambda: {
@@ -125,9 +114,7 @@ def contar_tls_records_por_conexion(pcap_file, client_ip):
 
 
 def imprimir_resultados(stats):
-    """
-    Imprime por pantalla las estadísticas TLS por conexión.
-    """
+    
     print(f"Conexiones TLS encontradas: {len(stats)}\n")
 
     for (server_ip, server_port, client_ip, client_port), valores in sorted(stats.items()):

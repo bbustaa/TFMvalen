@@ -18,7 +18,7 @@ def construir_mapa_tamanos_tls_por_frame(pcap_file):
 
 def paquete_pertenece_a_conexion(packet, client_ip, server_ip, server_port):
     """
-    Comprueba si el paquete pertenece a la conexión cliente-servidor.
+    Comprueba si el paquete pertenece a la conexión cliente-servidor
     """
     if not hasattr(packet, "ip") or not hasattr(packet, "tcp"):
         return False
@@ -61,7 +61,6 @@ def obtener_tamanos_tls_del_frame(packet, mapa_tls_por_frame):
 
 def calcular_bursts(pcap_file, client_ip, server_ip, server_port):
     """
-    Primer método de burst:
     se acumulan los bytes enviados por el servidor entre dos paquetes
     consecutivos enviados por el cliente + cualquier paquete del cliente cierra el burst --> ACKs, aplicación, TLS...
     """
@@ -105,9 +104,7 @@ def calcular_bursts(pcap_file, client_ip, server_ip, server_port):
 
 
 def calcular_estadisticas(valores):
-    """
-    Calcula mínimo, máximo, media, desviación típica y mediana.
-    """
+
     if not valores:
         return {
             "min": 0,
@@ -137,9 +134,7 @@ def calcular_estadisticas(valores):
 
 
 def imprimir_resultados(bursts):
-    """
-    Imprime la lista de bursts y sus estadísticas.
-    """
+
     print(f"\n")
     print("Lista de bursts:")
     print(bursts)

@@ -1,6 +1,5 @@
 import a_ConnStats
 
-
 def obtener_tamanos_tls_incoming_outgoing(pcap_file, client_ip):
     """
     Devuelve dos listas con todos los tamaños de TLS records:
@@ -54,9 +53,9 @@ if __name__ == "__main__":
 
     resultados = contar_numero_tamanos_tls_distintos(pcap_file, client_ip)
 
-    print("Number of different sizes:")
-    print(f"incoming_num_different_tls_sizes: {resultados['incoming_num_different_tls_sizes']}")
-    print(f"outgoing_num_different_tls_sizes: {resultados['outgoing_num_different_tls_sizes']}")
+    print("\n")
+    print(f"Tamaños diferentes en incoming: {resultados['incoming_num_different_tls_sizes']}")
+    print(f"Tamaños diferentes en outgoing: {resultados['outgoing_num_different_tls_sizes']}")
 
     print("\nTamaños incoming:")
     print(resultados["incoming_sizes"])
