@@ -5,12 +5,10 @@ import c_NumDiffSizes
 def obtener_20_tamanos_menos_frecuentes(lista_tamanos):
     """
     Devuelve los 20 tamaños TLS menos frecuentes de una lista.
+    
+    menor frecuencia > empate? menor tamaño
 
-    Criterio de ordenación:
-    1. Menor frecuencia primero.
-    2. En caso de empate, menor tamaño primero.
-
-    Si hay menos de 20 tamaños distintos, se rellena con ceros.
+    Si hay menos de 20 tamaños distintos, se rellena con ceros
     """
     contador = Counter(lista_tamanos)
 

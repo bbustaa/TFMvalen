@@ -108,7 +108,7 @@ def calcular_estadisticas(valores):
 
 def imprimir_resultados(valores):
 
-    print("\nMétodo 2 - número de TLS records del servidor en cada bloque de 20:")
+    print("\nnúmero de TLS records del servidor en cada bloque de 20:")
     print(valores)
     print(f"Número de ventanas completas: {len(valores)}")
     print(f"Valores iguales a 0: {valores.count(0)}")
