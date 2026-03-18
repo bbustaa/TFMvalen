@@ -11,3 +11,5 @@ venv/
 
 # carpetas
 comprobaciones/
+
+.env.local
