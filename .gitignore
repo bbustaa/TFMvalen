@@ -11,5 +11,6 @@ venv/
 
 # carpetas
 comprobaciones/
+datos/resultados/
 
 .env.local
