@@ -57,7 +57,7 @@ def imprimir_resumen(resultados):
     incoming_no_cero = obtener_indices_no_cero(incoming)
     outgoing_no_cero = obtener_indices_no_cero(outgoing)
 
-    print("SIZE DISTRIBUTION")
+    print("\n")
     print(f"Tamaños incoming observados: {len(incoming_no_cero)}")
     print(f"Tamaños outgoing observados: {len(outgoing_no_cero)}")
 
