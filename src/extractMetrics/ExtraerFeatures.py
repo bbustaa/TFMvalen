@@ -174,14 +174,28 @@ def extraer_todas_las_features(
         participa = (ip_src == client_ip or ip_dst == client_ip)
         if participa:
             total_tls_bytes += sum(record_lengths)
-            
+        
+        # dirección outgoing    
         if ip_src == client_ip:
+            # feature A
             total_outgoing_records += total_records
             outgoing_sizes.extend(record_lengths)
+            # feature D
+            # por cada tamaño de record TLS
+            for r in record_lengths:
+                # comprobamos que esté dentro del rango permitido
+                if 1 <= r <= MAX_TLS_RECORD_SIZE:
+                    # aumentamos en 1 la frec del tamaño r en outgoing_freq
+                    outgoing_freq[r - 1] += 1
             
         else:
+            # feature A
             total_incoming_records += total_records
             incoming_sizes.extend(record_lengths)
+            # feature D
+            for r in record_lengths:
+                if 1 <= r <= MAX_TLS_RECORD_SIZE:
+                    incoming_freq[r - 1] += 1
             
 # para comprobar que esta parte funciona
     return {
@@ -189,7 +203,11 @@ def extraer_todas_las_features(
         "total_outgoing_records": total_outgoing_records,
         "total_tls_bytes": total_tls_bytes,
         "incoming_sizes": incoming_sizes,
-        "outgoing_sizes": outgoing_sizes
+        "outgoing_sizes": outgoing_sizes,
+        "incoming_freq": incoming_freq,
+        "outgoing_freq": outgoing_freq,
+        "top 20 incoming sizes": top20Sizes(incoming_sizes),
+        "top 20 outgoing sizes": top20Sizes(outgoing_sizes)
     }
 
 
@@ -211,3 +229,7 @@ if __name__ == "__main__":
     print("Total TLS bytes:", resultado["total_tls_bytes"])
     print("Primeros 10 tamaños TLS incoming:", resultado["incoming_sizes"][:10])
     print("Primeros 10 tamaños TLS outgoing:", resultado["outgoing_sizes"][:10])
+    print("Frecuencia de tamaños TLS incoming (primeros 10):", resultado["incoming_freq"][:10])
+    print("Frecuencia de tamaños TLS outgoing (primeros 10):", resultado["outgoing_freq"][:10])
+    print("Top 20 tamaños menos frecuentes incoming:", resultado["top 20 incoming sizes"])
+    print("Top 20 tamaños menos frecuentes outgoing:", resultado["top 20 outgoing sizes"])
