@@ -149,6 +149,8 @@ def extraer_todas_las_features(
     
     burst_b1: list[int] = []  # bytes TLS enviados por el servidor entre dos paquetes enviados por el cliente
     burst_actual = 0
+    # antes del primer paquete del cliente puede haber basura del servidor
+    # asi que hasta que no detectemos algo del cliente no empezamos a sumar
     visto_cliente = False
     
     secuencia: list[tuple[str, int]] = []  # Secuencia de (origen: 'S'/'C', num_records) para la conexión
@@ -180,7 +182,7 @@ def extraer_todas_las_features(
             # feature A
             total_outgoing_records += total_records
             outgoing_sizes.extend(record_lengths)
-            # feature D
+            # feature E
             # por cada tamaño de record TLS
             for r in record_lengths:
                 # comprobamos que esté dentro del rango permitido
@@ -192,10 +194,58 @@ def extraer_todas_las_features(
             # feature A
             total_incoming_records += total_records
             incoming_sizes.extend(record_lengths)
-            # feature D
+            # feature E
             for r in record_lengths:
                 if 1 <= r <= MAX_TLS_RECORD_SIZE:
                     incoming_freq[r - 1] += 1
+                    
+        # ahora para los features B1 y B2 --> solo para la conexión 443
+        conexion = (
+            (ip_src == client_ip and ip_dst == server_ip and dst_port == server_port) or
+            (ip_src == server_ip and ip_dst == client_ip and src_port == server_port)  
+        )
+        
+        if conexion:
+            # paquete del cliente --> cierra burst actual y empieza uno nuevo
+            if ip_src == client_ip:
+                if visto_cliente:
+                    # feature B1
+                    # bytes TLS por el servidor entre dos paquetes del cliente
+                    burst_b1.append(burst_actual)
+                burst_actual = 0
+                visto_cliente = True
+                # feature B2
+                secuencia.append(('C', total_records))
+            else:
+                # paquete del servidor --> acumula bytes TLS en el burst actual
+                if visto_cliente:
+                    # feature B1
+                    burst_actual += sum(record_lengths)
+                # feature B2
+                secuencia.append(('S', total_records))
+                
+        bloques_b2: list[int] = []  # para almacenar los bloques de 20 records del servidor en B2
+        cont_s = 0  # contador de records del servidor en la secuencia
+        bloque_cont = 0  # contador de records en el bloque actual
+        
+        for origen, n in secuencia:
+            restante = n
+            while restante > 0:
+                espacio = BURST_BLOCK_SIZE - bloque_cont
+                tomar = min(restante, espacio)
+            
+                if origen == 'S':
+                    cont_s += tomar
+                    
+                bloque_cont += tomar
+                restante -= tomar
+                
+                if bloque_cont == BURST_BLOCK_SIZE:
+                    # bloque completo de 20 records del servidor
+                    bloques_b2.append(cont_s)
+                    bloque_cont = 0
+                    cont_s = 0
+                  
             
 # para comprobar que esta parte funciona
     return {
@@ -207,7 +257,9 @@ def extraer_todas_las_features(
         "incoming_freq": incoming_freq,
         "outgoing_freq": outgoing_freq,
         "top 20 incoming sizes": top20Sizes(incoming_sizes),
-        "top 20 outgoing sizes": top20Sizes(outgoing_sizes)
+        "top 20 outgoing sizes": top20Sizes(outgoing_sizes),
+        "burst_b1_stats": burstStats(burst_b1),
+        "burst_b2_stats": burstStats(bloques_b2)
     }
 
 
@@ -233,3 +285,5 @@ if __name__ == "__main__":
     print("Frecuencia de tamaños TLS outgoing (primeros 10):", resultado["outgoing_freq"][:10])
     print("Top 20 tamaños menos frecuentes incoming:", resultado["top 20 incoming sizes"])
     print("Top 20 tamaños menos frecuentes outgoing:", resultado["top 20 outgoing sizes"])
+    print("Burst B1 stats (min, max, std, mean, median):", resultado["burst_b1_stats"])
+    print("Burst B2 stats (min, max, std, mean, median):", resultado["burst_b2_stats"])
