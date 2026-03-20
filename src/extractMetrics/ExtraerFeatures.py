@@ -76,7 +76,8 @@ def extraer_frames_tls(pcap_file: str) -> list[dict]:
 
     return frames
 
-#  SEGUNDO PASO --> extracción de features
+#  SEGUNDO PASO --> Definición de funciones auxiliares 
+#  necesarias para la extracción de features
 
 def burstStats(valores: list) -> tuple:
     
@@ -100,6 +101,23 @@ def burstStats(valores: list) -> tuple:
         statistics.median(valores),
     )
 
+def top20Sizes(sizes: list[int]) -> list[int]:
+    
+    # con el conjunto/set de tamaños de TLS records --> devuelve los 20 tamaños menos frecuentes --> 
+    # ordenados por frecuencia y en caso de empate por tamaño
+
+    if not sizes:
+        return [0] * 20
+
+    contador = Counter(sizes)
+    ordenados = sorted(contador.items(), key=lambda x: (x[1], x[0]))
+    top20 = [tam for tam, _ in ordenados[:20]]
+
+    while len(top20) < 20:
+        top20.append(0)
+
+    return top20
+
 if __name__ == "__main__":
 
     pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
@@ -112,6 +130,7 @@ if __name__ == "__main__":
         todos_los_records.extend(frame["record_lengths"])
 
     stats = burstStats(todos_los_records)
+    sizes = top20Sizes(todos_los_records)
     
     # hacemos una pruebita de que esto funcione :)
 
@@ -126,3 +145,5 @@ if __name__ == "__main__":
     print(f"Desviación típica: {stats[2]}")
     print(f"Media: {stats[3]}")
     print(f"Mediana: {stats[4]}")
+    print("\nResultado de top20Sizes(sizes):")
+    print(f"Top 20 tamaños TLS menos frecuentes: {sizes}")
