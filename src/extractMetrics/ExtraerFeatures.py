@@ -118,32 +118,96 @@ def top20Sizes(sizes: list[int]) -> list[int]:
 
     return top20
 
-if __name__ == "__main__":
+# TERCER PASO --> Extraer los features
 
-    pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
-
-    frames = extraer_frames_tls(pcap_file)
-
-    # Construimos una lista con todos los tamaños de TLS records del pcap
-    todos_los_records = []
-    for frame in frames:
-        todos_los_records.extend(frame["record_lengths"])
-
-    stats = burstStats(todos_los_records)
-    sizes = top20Sizes(todos_los_records)
+def extraer_todas_las_features(
+    pcap_file: str,
+    client_ip: str,
+    server_ip: str,
+    server_port: int,
+) -> list:
     
-    # hacemos una pruebita de que esto funcione :)
+    # para la extracción de las features necesitamos
+    # el pcap, las ips (cliente y servidor), y el puerto del servidor
+    # el vectore de features --> 36919 valores numéricos por cada conexión TLS
+    
+    frames = extraer_frames_tls(pcap_file)
+    
+    # PARA LOS FEATURES A, C y E --> conexiones TLS entre cliente y servidor?
+    
+    total_incoming_records = 0
+    total_outgoing_records = 0
+    total_tls_bytes = 0
+    
+    incoming_sizes: list[int] = []      # todos los tamaños TLS incoming
+    outgoing_sizes: list[int] = []      # todos los tamaños TLS outgoing
+    
+    incoming_freq = [0] * MAX_TLS_RECORD_SIZE
+    outgoing_freq = [0] * MAX_TLS_RECORD_SIZE   # dos listas de 18432 elementos
+    
+    #PARA LOS FEATURES B1 y B2 --> burstStats 
+    
+    burst_b1: list[int] = []  # bytes TLS enviados por el servidor entre dos paquetes enviados por el cliente
+    burst_actual = 0
+    visto_cliente = False
+    
+    secuencia: list[tuple[str, int]] = []  # Secuencia de (origen: 'S'/'C', num_records) para la conexión
+    
+    for frame in frames:
+        
+        ip_src = frame["ip_src"]
+        ip_dst = frame["ip_dst"]
+        src_port = frame["src_port"]
+        dst_port = frame["dst_port"]
+        record_lengths = frame["record_lengths"]
+        
+        # verificar si el frame corresponde al record TLS
+        # de la conexión entre el cliente y el servidor
+        if not record_lengths:
+            continue
+        
+        # cada tamaño representa un record TLS
+        total_records = len(record_lengths)
+        
+        # para los features A, C y E --> hay que determinar si el tráfico es incoming o outgoing
+        # comprobamos si en la conexión participa el cliente
+        participa = (ip_src == client_ip or ip_dst == client_ip)
+        if participa:
+            total_tls_bytes += sum(record_lengths)
+            
+        if ip_src == client_ip:
+            total_outgoing_records += total_records
+            outgoing_sizes.extend(record_lengths)
+            
+        else:
+            total_incoming_records += total_records
+            incoming_sizes.extend(record_lengths)
+            
+# para comprobar que esta parte funciona
+    return {
+        "total_incoming_records": total_incoming_records,
+        "total_outgoing_records": total_outgoing_records,
+        "total_tls_bytes": total_tls_bytes,
+        "incoming_sizes": incoming_sizes,
+        "outgoing_sizes": outgoing_sizes
+    }
 
-    print(f"Número de frames TLS encontrados: {len(frames)}")
-    # cada tamaño corrssponde a un TLS record
-    print(f"Número total de TLS records encontrados: {len(todos_los_records)}")
 
-    # hacemos los calculos de todos los valores de la captura
-    print("\nResultado de burstStats(valores):")
-    print(f"Mínimo: {stats[0]}")
-    print(f"Máximo: {stats[1]}")
-    print(f"Desviación típica: {stats[2]}")
-    print(f"Media: {stats[3]}")
-    print(f"Mediana: {stats[4]}")
-    print("\nResultado de top20Sizes(sizes):")
-    print(f"Top 20 tamaños TLS menos frecuentes: {sizes}")
+if __name__ == "__main__":
+    pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
+    client_ip = "172.16.56.2"
+    server_ip = "172.16.56.1"
+    server_port = 443
+
+    resultado = extraer_todas_las_features(
+        pcap_file=pcap_file,
+        client_ip=client_ip,
+        server_ip=server_ip,
+        server_port=server_port,
+    )
+    
+    print("Total incoming records:", resultado["total_incoming_records"])
+    print("Total outgoing records:", resultado["total_outgoing_records"])
+    print("Total TLS bytes:", resultado["total_tls_bytes"])
+    print("Primeros 10 tamaños TLS incoming:", resultado["incoming_sizes"][:10])
+    print("Primeros 10 tamaños TLS outgoing:", resultado["outgoing_sizes"][:10])
