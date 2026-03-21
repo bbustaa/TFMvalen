@@ -245,6 +245,19 @@ def extraer_todas_las_features(
                     bloques_b2.append(cont_s)
                     bloque_cont = 0
                     cont_s = 0
+                    
+        # con la función de antes --> top 20 tamaños menos frecuentes
+        
+        incomin_top20 = top20Sizes(incoming_sizes)
+        outgoing_top20 = top20Sizes(outgoing_sizes)
+        
+        # obtenemos las estadísticas
+        
+        min_b1, max_b1, std_b1, mean_b1, median_b1 = burstStats(burst_b1)
+        min_b2, max_b2, std_b2, mean_b2, median_b2 = burstStats(bloques_b2)
+        
+        num_incomingDiff = len(set(incoming_sizes))
+        num_outgoingDiff = len(set(outgoing_sizes))
                   
             
 # para comprobar que esta parte funciona
@@ -258,8 +271,10 @@ def extraer_todas_las_features(
         "outgoing_freq": outgoing_freq,
         "top 20 incoming sizes": top20Sizes(incoming_sizes),
         "top 20 outgoing sizes": top20Sizes(outgoing_sizes),
-        "burst_b1_stats": burstStats(burst_b1),
-        "burst_b2_stats": burstStats(bloques_b2)
+        "burst_b1_stats": (min_b1, max_b1, std_b1, mean_b1, median_b1),
+        "burst_b2_stats": (min_b2, max_b2, std_b2, mean_b2, median_b2),
+        "num_incoming_diff": num_incomingDiff,
+        "num_outgoing_diff": num_outgoingDiff,
     }
 
 
@@ -285,5 +300,7 @@ if __name__ == "__main__":
     print("Frecuencia de tamaños TLS outgoing (primeros 10):", resultado["outgoing_freq"][:10])
     print("Top 20 tamaños menos frecuentes incoming:", resultado["top 20 incoming sizes"])
     print("Top 20 tamaños menos frecuentes outgoing:", resultado["top 20 outgoing sizes"])
-    print("Burst B1 stats (min, max, std, mean, median):", resultado["burst_b1_stats"])
-    print("Burst B2 stats (min, max, std, mean, median):", resultado["burst_b2_stats"])
+    print("Estadísticas burst B1 (min, max, std, mean, median):", resultado["burst_b1_stats"])
+    print("Estadísticas burst B2 (min, max, std, mean, median):", resultado["burst_b2_stats"])
+    print("Número de tamaños TLS diferentes incoming:", resultado["num_incoming_diff"])
+    print("Número de tamaños TLS diferentes outgoing:", resultado["num_outgoing_diff"])
