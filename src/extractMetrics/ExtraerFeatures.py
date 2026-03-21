@@ -1,7 +1,7 @@
 import subprocess
 import statistics
 import argparse
-from collections import defaultdict, Counter
+from collections import Counter
 import os
 from datetime import datetime
 
@@ -174,8 +174,10 @@ def extraer_todas_las_features(
         # para los features A, C y E --> hay que determinar si el tráfico es incoming o outgoing
         # comprobamos si en la conexión participa el cliente
         participa = (ip_src == client_ip or ip_dst == client_ip)
-        if participa:
-            total_tls_bytes += sum(record_lengths)
+        if not participa:
+            continue
+        
+        total_tls_bytes += sum(record_lengths)
         
         # dirección outgoing    
         if ip_src == client_ip:
@@ -201,8 +203,8 @@ def extraer_todas_las_features(
                     
         # ahora para los features B1 y B2 --> solo para la conexión 443
         conexion = (
-            (ip_src == client_ip and ip_dst == server_ip and dst_port == server_port) or
-            (ip_src == server_ip and ip_dst == client_ip and src_port == server_port)  
+            (ip_src == client_ip and ip_dst == server_ip and dst_port == str(server_port)) or
+            (ip_src == server_ip and ip_dst == client_ip and src_port == str(server_port))  
         )
         
         if conexion:
@@ -224,83 +226,100 @@ def extraer_todas_las_features(
                 # feature B2
                 secuencia.append(('S', total_records))
                 
-        bloques_b2: list[int] = []  # para almacenar los bloques de 20 records del servidor en B2
-        cont_s = 0  # contador de records del servidor en la secuencia
-        bloque_cont = 0  # contador de records en el bloque actual
+    bloques_b2: list[int] = []  # para almacenar los bloques de 20 records del servidor en B2
+    cont_s = 0  # contador de records del servidor en la secuencia
+    bloque_cont = 0  # contador de records en el bloque actual
         
-        for origen, n in secuencia:
-            restante = n
-            while restante > 0:
-                espacio = BURST_BLOCK_SIZE - bloque_cont
-                tomar = min(restante, espacio)
+    for origen, n in secuencia:
+        restante = n
+        while restante > 0:
+            espacio = BURST_BLOCK_SIZE - bloque_cont
+            tomar = min(restante, espacio)
             
-                if origen == 'S':
-                    cont_s += tomar
+            if origen == 'S':
+                cont_s += tomar
                     
-                bloque_cont += tomar
-                restante -= tomar
+            bloque_cont += tomar
+            restante -= tomar
                 
-                if bloque_cont == BURST_BLOCK_SIZE:
-                    # bloque completo de 20 records del servidor
-                    bloques_b2.append(cont_s)
-                    bloque_cont = 0
-                    cont_s = 0
+            if bloque_cont == BURST_BLOCK_SIZE:
+                # bloque completo de 20 records del servidor
+                bloques_b2.append(cont_s)
+                bloque_cont = 0
+                cont_s = 0
                     
-        # con la función de antes --> top 20 tamaños menos frecuentes
+    # con la función de antes --> top 20 tamaños menos frecuentes
         
-        incomin_top20 = top20Sizes(incoming_sizes)
-        outgoing_top20 = top20Sizes(outgoing_sizes)
+    incomin_top20 = top20Sizes(incoming_sizes)
+    outgoing_top20 = top20Sizes(outgoing_sizes)
         
-        # obtenemos las estadísticas
+    # obtenemos las estadísticas
         
-        min_b1, max_b1, std_b1, mean_b1, median_b1 = burstStats(burst_b1)
-        min_b2, max_b2, std_b2, mean_b2, median_b2 = burstStats(bloques_b2)
+    min_b1, max_b1, std_b1, mean_b1, median_b1 = burstStats(burst_b1)
+    min_b2, max_b2, std_b2, mean_b2, median_b2 = burstStats(bloques_b2)
         
-        num_incomingDiff = len(set(incoming_sizes))
-        num_outgoingDiff = len(set(outgoing_sizes))
-                  
-            
-# para comprobar que esta parte funciona
-    return {
-        "total_incoming_records": total_incoming_records,
-        "total_outgoing_records": total_outgoing_records,
-        "total_tls_bytes": total_tls_bytes,
-        "incoming_sizes": incoming_sizes,
-        "outgoing_sizes": outgoing_sizes,
-        "incoming_freq": incoming_freq,
-        "outgoing_freq": outgoing_freq,
-        "top 20 incoming sizes": top20Sizes(incoming_sizes),
-        "top 20 outgoing sizes": top20Sizes(outgoing_sizes),
-        "burst_b1_stats": (min_b1, max_b1, std_b1, mean_b1, median_b1),
-        "burst_b2_stats": (min_b2, max_b2, std_b2, mean_b2, median_b2),
-        "num_incoming_diff": num_incomingDiff,
-        "num_outgoing_diff": num_outgoingDiff,
-    }
-
+    num_incomingDiff = len(set(incoming_sizes))
+    num_outgoingDiff = len(set(outgoing_sizes))
+    
+    # CUARTO PASO --> ensamblamos el vector del paper
+    
+    vector = []
+    
+    # a) ConnStats --> [0 ... 2]
+    vector += [total_incoming_records, total_outgoing_records, total_tls_bytes]
+    
+    # b) b1_BurstStats --> [3 ... 7]   
+    vector += [min_b1, max_b1, std_b1, mean_b1, median_b1]
+    
+    # b) b2_BurstStats --> [8 ... 12]
+    vector += [min_b2, max_b2, std_b2, mean_b2, median_b2]  
+    
+    # c) num_incomingDiff y num_outgoingDiff --> [13 ... 14]
+    vector += [num_incomingDiff, num_outgoingDiff]
+    
+    # d) 20 tamaños menos frecuentes incoming --> [15 ... 54]
+    vector += incomin_top20
+    vector += outgoing_top20
+    
+    # e) frecuencia de tamaños (todos los tamaños posibles)
+    vector += incoming_freq
+    vector += outgoing_freq
+    
+    assert len(vector) == 36_919, f"Error: vector tiene {len(vector)} features, esperados 36,919"
+    
+    return vector       
 
 if __name__ == "__main__":
-    pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
     client_ip = "172.16.56.2"
     server_ip = "172.16.56.1"
     server_port = 443
+    
+    parser = argparse.ArgumentParser(
+        description= "Extrae el vector de features H2Classifier de un archivo PCAP"
+    )
+    parser.add_argument(
+        "pcap",
+        help="Ruta al archivo .pcap"
+    )
+    args = parser.parse_args()
 
     resultado = extraer_todas_las_features(
-        pcap_file=pcap_file,
+        pcap_file=args.pcap,
         client_ip=client_ip,
         server_ip=server_ip,
         server_port=server_port,
     )
     
-    print("Total incoming records:", resultado["total_incoming_records"])
-    print("Total outgoing records:", resultado["total_outgoing_records"])
-    print("Total TLS bytes:", resultado["total_tls_bytes"])
-    print("Primeros 10 tamaños TLS incoming:", resultado["incoming_sizes"][:10])
-    print("Primeros 10 tamaños TLS outgoing:", resultado["outgoing_sizes"][:10])
-    print("Frecuencia de tamaños TLS incoming (primeros 10):", resultado["incoming_freq"][:10])
-    print("Frecuencia de tamaños TLS outgoing (primeros 10):", resultado["outgoing_freq"][:10])
-    print("Top 20 tamaños menos frecuentes incoming:", resultado["top 20 incoming sizes"])
-    print("Top 20 tamaños menos frecuentes outgoing:", resultado["top 20 outgoing sizes"])
-    print("Estadísticas burst B1 (min, max, std, mean, median):", resultado["burst_b1_stats"])
-    print("Estadísticas burst B2 (min, max, std, mean, median):", resultado["burst_b2_stats"])
-    print("Número de tamaños TLS diferentes incoming:", resultado["num_incoming_diff"])
-    print("Número de tamaños TLS diferentes outgoing:", resultado["num_outgoing_diff"])
+    # almacenamos los resultados en una carpeta
+    output_dir = "datos/resultados"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # guardamos el resultado en un csv con nombre basado en el pcap y timestamp
+    nombre = os.path.splitext(os.path.basename(args.pcap))[0]
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = os.path.join(output_dir, f"{nombre}_features_{timestamp}.csv")
+    
+    with open(output_path, "w") as f:
+        f.write(",".join(map(str, resultado)))
+        
+    print(f"Todo listo :) --> resultados guardados en: {output_path}")
