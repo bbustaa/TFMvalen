@@ -1,3 +1,4 @@
+import csv
 import subprocess
 import statistics
 import argparse
@@ -287,7 +288,63 @@ def extraer_todas_las_features(
     
     assert len(vector) == 36_919, f"Error: vector tiene {len(vector)} features, esperados 36,919"
     
-    return vector       
+    return vector   
+
+# ponemos etiquetas a las métricas extraídas a partir 
+# del nombre del fichero --> realmente no sé todavía que ponerles jeje
+
+def nombrarFichero(pcap_file: str) -> str:
+    return os.path.splitext(os.path.basename(pcap_file))[0]
+    # más adelante supongo que los nombres serán diferentes
+
+# En caso del TFM --> hay que evaluar muchos pcaps de un solo escenario --> 
+# hacemos que este código lea y calcule las métricas de todos los pcaps del escenario
+# que están almacenados en sus respectivos ficheros y los guardamos en un directorio de
+# resultados :)
+
+def procesarDirectorio(
+    directorio: str,
+    client_ip: str,
+    server_ip: str,
+    server_port: int,
+    output_path: str,
+) -> None:
+    
+    pcaps = sorted([
+        f for f in os.listdir(directorio) 
+        if f.endswith(".pcap")
+    ])
+    
+    if not pcaps:
+        print(f"No se encontraron archivos .pcap en el directorio: {directorio}")
+        return
+    
+    cabecera = ["label"] + [f"feature_{i}" for i in range(36919)]
+    errores = []
+    
+    with open(output_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(cabecera)
+        
+        for i, nombre in enumerate(pcaps):
+            pcap_path = os.path.join(directorio, nombre)
+            etiqueta = nombrarFichero(nombre)
+            print(f"[{i+1}/{len(pcaps)}] {nombre}  →  label: '{etiqueta}'", end="", flush=True)
+            try:
+                vector = extraer_todas_las_features(
+                    pcap_file=pcap_path,
+                    client_ip=client_ip,
+                    server_ip=server_ip,
+                    server_port=server_port,
+                )
+                writer.writerow([etiqueta] + vector)
+            except Exception as e:
+                print(f"\nError procesando {nombre}: {e}")
+                errores.append((nombre, str(e)))
+
+    print(f"\nProcesamiento completado. Resultados guardados en: {output_path}")
+    if errores:
+        print(f"Ficheros con errores: {errores}")
 
 if __name__ == "__main__":
     client_ip = "172.16.56.2"
@@ -298,28 +355,26 @@ if __name__ == "__main__":
         description= "Extrae el vector de features H2Classifier de un archivo PCAP"
     )
     parser.add_argument(
-        "pcap",
-        help="Ruta al archivo .pcap"
+        "directorio",
+        help="Ruta al directorio que contiene los archivos .pcap"
+    )
+    parser.add_argument(
+        "--output", "-o",
+        default="datos/resultados/features.csv",
+        help="Ruta al archivo CSV de salida"
     )
     args = parser.parse_args()
-
-    resultado = extraer_todas_las_features(
-        pcap_file=args.pcap,
+    
+    if args.output:
+        output_path = args.output
+    else:
+        timestamp   = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = os.path.join(args.directorio, f"features_{timestamp}.csv")
+    
+    procesarDirectorio(
+        directorio=args.directorio,
         client_ip=client_ip,
         server_ip=server_ip,
         server_port=server_port,
+        output_path=output_path,
     )
-    
-    # almacenamos los resultados en una carpeta
-    output_dir = "datos/resultados"
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # guardamos el resultado en un csv con nombre basado en el pcap y timestamp
-    nombre = os.path.splitext(os.path.basename(args.pcap))[0]
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = os.path.join(output_dir, f"{nombre}_features_{timestamp}.csv")
-    
-    with open(output_path, "w") as f:
-        f.write(",".join(map(str, resultado)))
-        
-    print(f"Todo listo :) --> resultados guardados en: {output_path}")
