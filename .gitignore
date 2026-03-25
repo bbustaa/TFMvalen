@@ -6,12 +6,13 @@ venv/
 
 # Logs / outputs
 *.log
-#*.csv
+*.csv
 *.json
 #*.pcap
 
 # carpetas
 comprobaciones/
 #datos/resultados/
+datos/prueba1/escenario1/dataset
 
 .env.local

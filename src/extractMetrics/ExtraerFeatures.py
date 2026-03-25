@@ -6,7 +6,8 @@ from collections import Counter
 import os
 from datetime import datetime
 
-TSHARK_PATH = r"C:\Program Files\Wireshark\tshark.exe"
+#TSHARK_PATH = r"C:\Program Files\Wireshark\tshark.exe"
+TSHARK_PATH = r"/usr/bin/tshark"
 MAX_TLS_RECORD_SIZE = 18432
 BURST_BLOCK_SIZE = 20
 
