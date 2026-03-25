@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-ORIGEN="/RAID5-22TB/datos/escenario1/captura"
-DESTINO="/RAID5-22TB/valentina.bustamante/TFMvalen/datos/prueba1/escenario1/dataset"
+ORIGEN="/RAID5-22TB/valentina.bustamante/TFMvalen/captura"
+DESTINO="/RAID5-22TB/valentina.bustamante/TFMvalen/datos/prueba1/escenario2/dataset"
 LIMITE="captura_02100_2100.pcap"
 
 mkdir -p "$DESTINO"
