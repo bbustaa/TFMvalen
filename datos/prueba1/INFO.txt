@@ -1,0 +1,6 @@
+En esta prueba se van a pillar las 20 primeras capturas de las 100 páginas.
+
+Como entrenamos con el 80% de las muestras.
+
+- Entrenamos con 16 capturas de cada pàgina.
+- Probamos el funcionamiento con 4.
