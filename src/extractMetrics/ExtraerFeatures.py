@@ -292,10 +292,18 @@ def extraer_todas_las_features(
 
 # ponemos etiquetas a las métricas extraídas a partir 
 # del nombre del fichero --> realmente no sé todavía que ponerles jeje
+# lol
 
 def nombrarFichero(pcap_file: str) -> str:
-    return os.path.splitext(os.path.basename(pcap_file))[0]
+    nombre = os.path.splitext(os.path.basename(pcap_file))[0]
     # más adelante supongo que los nombres serán diferentes
+    partes = nombre.split("_")
+    bloque = partes[1]
+    pagina = int(bloque[-2:])
+    if pagina == 0:
+        pagina = 100
+    return f"pagina_{pagina}"
+    # Plot twist efectivamente serán diferentes jajaja
 
 # En caso del TFM --> hay que evaluar muchos pcaps de un solo escenario --> 
 # hacemos que este código lea y calcule las métricas de todos los pcaps del escenario
