@@ -6,11 +6,11 @@ venv/
 
 # Logs / outputs
 *.log
-*.csv
+#*.csv
 *.json
 
 # carpetas
 comprobaciones/
-datos/resultados/
+# datos/resultados/
 
 .env.local
