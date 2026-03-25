@@ -8,9 +8,10 @@ venv/
 *.log
 #*.csv
 *.json
+*.pcap
 
 # carpetas
 comprobaciones/
-# datos/resultados/
+#datos/resultados/
 
 .env.local
