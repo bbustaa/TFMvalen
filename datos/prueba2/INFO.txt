@@ -1,0 +1,5 @@
+Prueba con todos los datos y todos los escenarios de captura (closed world)
+
+- Escenario 1 --> Páginas con tamaño y recurso variable
+- Escenario 2 --> Páginas con tamaño total fijo y número de recursos variable.
+- Escenario 3 --> Páginas con tamaños y número de recursos fijo.
