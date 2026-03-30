@@ -3,6 +3,7 @@ import numpy as np
 import argparse
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
 
 # RandomForestClassifier está implementado sobre la clase DecisionTreeClassifier, 
 # y este a su vez utiliza el algoritmo CART (Classification and Regression Trees) 
@@ -77,6 +78,19 @@ def clasificadorCW(csv_path: str) -> None:
     print("\nResultado OG")
     print("Accuracy:", acc)
     print("Aciertos:", (y_pred == y_test).sum(), "de", len(y_test))
+    
+    # Para ver qé páginas confunde con cuáles
+    labels = sorted(y_test.unique())
+    cm = confusion_matrix(y_test, y_pred, labels=labels)
+    
+    print("\nMatriz de confusión:")
+    print(cm)                           # digonales = aciertos, fuera de diagonal = errores
+    
+    importancias = pd.Series(clf.feature_importances_, index=X_train.columns)
+    top20 = importancias.sort_values(ascending=False).head(20)
+
+    print("\nTop 20 features más importantes:")
+    print(top20)
 
     # PRUEBA CON LABELS BARAJADAS --> para comprobar que el modelo no está memorizando las etiquetas
     # ESTO PORQUE ME DABA ACCURACY DEL 100% Y ME PARECÌA MUY PERFECTO Y ME DIJO CHATI QUE PODÍA
