@@ -30,9 +30,12 @@ def clasificadorCW(csv_path: str) -> dict:
         # índices de las filas que pertenecen a esa clase --> copia para poder barajear
         indices = grupo.index.to_numpy().copy()
         rng.shuffle(indices)
+        
+        n = len(indices)
+        n_train = int(n * 0.8)  # 80% para train, 20% para test
 
-        train_idx.extend(indices[:8000])   # 8000 para train
-        test_idx.extend(indices[8000:8000+2000])    # 2000 para test
+        train_idx.extend(indices[:n_train])          # primeros 80% para train
+        test_idx.extend(indices[n_train:])           # últimos 20% para test
 
     # se construyen los dataframes de train y test usando los índices seleccionados
     df_train = df.loc[train_idx]
