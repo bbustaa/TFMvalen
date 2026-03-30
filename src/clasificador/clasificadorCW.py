@@ -165,6 +165,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    resultados = clasificadorCW(args.csv, args.output)
+    resultados = clasificadorCW(args.csv)
     if args.output:
         guardar_resultados(resultados, args.output)
