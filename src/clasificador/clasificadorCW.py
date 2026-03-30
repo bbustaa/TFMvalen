@@ -134,6 +134,8 @@ def clasificadorCW(csv_path: str) -> dict:
         "accuracy_shuffle": acc_shuffle,
         "aciertos_shuffle": aciertos_shuffle,
     }
+    
+    return resultados
         
 def guardar_resultados(resultados: dict, output_path: str) -> None:
     with open(output_path, "w") as f:
