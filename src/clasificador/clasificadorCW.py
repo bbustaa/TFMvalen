@@ -3,6 +3,7 @@ import numpy as np
 import argparse
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
+from mapeo_features import nombre_feature
 
 # RandomForestClassifier está implementado sobre la clase DecisionTreeClassifier, 
 # y este a su vez utiliza el algoritmo CART (Classification and Regression Trees) 
@@ -41,20 +42,11 @@ def clasificadorCW(csv_path: str) -> dict:
     df_train = df.loc[train_idx]
     df_test = df.loc[test_idx]
 
-    # se muestra el número de muestras en cada conjunto --> mas que todo para comprobar
-    # que se está haciendo bien :)
-    #print("Train:", df_train.shape)
-    #print("Test:", df_test.shape)
-
     # comprobación de que no hay solapamiento entre train y test
     train_set = set(train_idx)
     test_set = set(test_idx)
     interseccion = len(train_set.intersection(test_set))
     cont_clases = df["label"].value_counts().sort_index()
-
-    #print("Intersección train/test:", len(train_set.intersection(test_set)))    # intersecciòn debe ser 0 --> en caso contrario --> fuga de info
-    #print("\nNúmero de muestras por clase:")                                    # nùmero de muestras por por clase en el dataset --> todas las pàginas deben tener el mismo nùmero                           
-    #print(df["label"].value_counts().sort_index())
 
     # separamos las características (X) de las etiquetas (y) para ambos conjuntos
     X_train = df_train.drop(columns=["label"])
@@ -80,22 +72,20 @@ def clasificadorCW(csv_path: str) -> dict:
     # se calcula la precisión de las predicciones comparándolas con las etiquetas reales
     acc = accuracy_score(y_test, y_pred)
     aciertos = (y_pred == y_test).sum()
-    #print("\nResultado OG")
-    #print("Accuracy:", acc)
-    #print("Aciertos:", (y_pred == y_test).sum(), "de", len(y_test))
     
     # Para ver qé páginas confunde con cuáles
     labels = sorted(y_test.unique())
     cm = confusion_matrix(y_test, y_pred, labels=labels)
     
-    #print("\nMatriz de confusión:")
-    #print(cm)                           # digonales = aciertos, fuera de diagonal = errores
-    
     importancias = pd.Series(clf.feature_importances_, index=X_train.columns)
     top20 = importancias.sort_values(ascending=False).head(20)
 
-    #print("\nTop 20 features más importantes:")
-    #print(top20)
+    tabla_top20 = pd.DataFrame({
+        "ranking": range(1, len(top20) + 1),
+        "feature": top20.index,
+        "descripcion": [nombre_feature(f) for f in top20.index],
+        "importancia": top20.values,
+    })
 
     # PRUEBA CON LABELS BARAJADAS --> para comprobar que el modelo no está memorizando las etiquetas
     # ESTO PORQUE ME DABA ACCURACY DEL 100% Y ME PARECÌA MUY PERFECTO Y ME DIJO CHATI QUE PODÍA
@@ -116,10 +106,6 @@ def clasificadorCW(csv_path: str) -> dict:
 
     acc_shuffle = accuracy_score(y_test, y_pred_shuffle)
     aciertos_shuffle = (y_pred_shuffle == y_test).sum()
-
-    #print("\nPrueba barajeada (?)")
-    #print("Accuracy con labels barajadas:", acc_shuffle)
-    #print("Aciertos con labels barajadas:", (y_pred_shuffle == y_test).sum(), "de", len(y_test))
     
     resultados = {
         "train_shape": df_train.shape,
@@ -133,14 +119,29 @@ def clasificadorCW(csv_path: str) -> dict:
         "top20_features": top20,
         "accuracy_shuffle": acc_shuffle,
         "aciertos_shuffle": aciertos_shuffle,
+        "tabla_top20_features": tabla_top20
     }
     
-    return resultados
+    # gráficas :)
+    importancias = clf.feature_importances_
+    feature_names = list(X_train.columns)
+    
+    # para gráficas :)
+    resultados_graf = {
+    "y_test": y_test,
+    "y_pred": y_pred,
+    "labels": labels,
+    "df": df,
+    "feature_importances": importancias,
+    "feature_names": feature_names,
+    }
+    
+    return resultados, resultados_graf
         
 def guardar_resultados(resultados: dict, output_path: str) -> None:
     with open(output_path, "w") as f:
         f.write("Resultados del Clasificador Random Forest Closed World\n")
-        f.write("=====================================================\n\n")
+        f.write("\n\n")
         f.write(f"Shape del conjunto de entrenamiento: {resultados['train_shape']}\n")
         f.write(f"Shape del conjunto de test: {resultados['test_shape']}\n")
         f.write(f"Intersección entre train y test: {resultados['interseccion_train_test']}\n")
@@ -153,8 +154,19 @@ def guardar_resultados(resultados: dict, output_path: str) -> None:
         for row in cm:
             f.write("  " + " ".join(f"{num:5d}" for num in row) + "\n")
         f.write("\nTop 20 features más importantes:\n")
-        for feature, importance in resultados["top20_features"].items():
-            f.write(f"  {feature}: {importance:.4f}\n")
+        tabla = resultados["tabla_top20_features"]
+
+        f.write(f"{'Rank':<6}{'Feature':<18}{'Descripción':<40}{'Importancia':>12}\n")
+        f.write("-" * 76 + "\n")
+
+        for _, row in tabla.iterrows():
+            f.write(
+                f"{row['ranking']:<6}"
+                f"{row['feature']:<18}"
+                f"{row['descripcion']:<40}"
+                f"{row['importancia']:>12.4f}\n"
+            )
+            
         f.write(f"\nAccuracy con labels barajadas: {resultados['accuracy_shuffle']:.4f}\n")
         f.write(f"Aciertos con labels barajadas: {resultados['aciertos_shuffle']} de {resultados['total_test']}\n")
 
@@ -170,6 +182,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    resultados = clasificadorCW(args.csv)
+    resultados, resultados_graf = clasificadorCW(args.csv)
     if args.output:
         guardar_resultados(resultados, args.output)
