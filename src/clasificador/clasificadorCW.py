@@ -1,8 +1,10 @@
+import os
 import pandas as pd
 import numpy as np
 import argparse
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
+from graficar_resultados import graficar_mapa_calor
 from mapeo_features import nombre_feature
 
 # RandomForestClassifier está implementado sobre la clase DecisionTreeClassifier, 
@@ -105,6 +107,7 @@ def clasificadorCW(csv_path: str, n_train: int, seed: int) -> dict:
         "aciertos": aciertos,
         "total_test": len(y_test),
         "matriz_confusion": cm,
+        "labels": labels,
         "tabla_top20_features": tabla_top20,
         "seed": seed
     }
@@ -169,3 +172,10 @@ if __name__ == "__main__":
     resultados = clasificadorCW(args.csv, n_train=args.n_train, seed=args.seed)
     if args.output:
         guardar_resultados(resultados, args.output)
+        
+    graficar_mapa_calor(
+        cm=resultados["matriz_confusion"],
+        labels=resultados["labels"],
+        output_dir=os.path.dirname(args.output),
+        nombre_archivo="mapa_calor.png"
+    )
