@@ -9,9 +9,14 @@ from mapeo_features import nombre_feature
 # y este a su vez utiliza el algoritmo CART (Classification and Regression Trees) 
 # como método base para construir cada árbol
 
-def clasificadorCW(csv_path: str) -> dict:
+def clasificadorCW(csv_path: str, n_train: int, seed: int) -> dict:
     # bueno lo primero cargar el csv con los features :)
     # cada fila contiene una muestra correspondiente a una captura
+    
+    # validación del parámetro
+    if not (1 <= n_train <= 99):
+        raise ValueError("n_train debe estar entre 1 y 99 (inclusive)")
+    
     df = pd.read_csv(csv_path)
 
     # dos listas --> almacenan índices de las muestras que se
@@ -22,7 +27,7 @@ def clasificadorCW(csv_path: str) -> dict:
     # para reproducibilidad, fijamos la semilla del generador de números aleatorios
     # esto asegura que cada vez que ejecutemos el código, obtendremos la misma división 
     # entre train y test
-    rng = np.random.default_rng(42)
+    rng = np.random.default_rng(seed)
 
     # agrupamos el DataFrame por la columna "label", que contiene las clases de cada muestra
     # división independiente dentro de cada clase
@@ -33,10 +38,10 @@ def clasificadorCW(csv_path: str) -> dict:
         rng.shuffle(indices)
         
         n = len(indices)
-        n_train = int(n * 0.8)  # 80% para train, 20% para test
+        n_train_samples = int(n * n_train / 100)  # conversión de porcentaje a número de muestras
 
-        train_idx.extend(indices[:n_train])          # primeros 80% para train
-        test_idx.extend(indices[n_train:])           # últimos 20% para test
+        train_idx.extend(indices[:n_train_samples])         # primeras n_train_samples muestras para entrenamiento
+        test_idx.extend(indices[n_train_samples:])          # resto de muestras para test
 
     # se construyen los dataframes de train y test usando los índices seleccionados
     df_train = df.loc[train_idx]
@@ -58,9 +63,9 @@ def clasificadorCW(csv_path: str) -> dict:
     # ENTRENAMIENTO DEL RANDOM FOREST --> conjunto de varios árboles de decisión
     # entrenados con el subconjunto de datos mencionado antes
     clf = RandomForestClassifier(
-        n_estimators=100,           # número de árboles en el bosque --> 100 páginas conocidas :)
+        n_estimators=100,           # número de árboles en el Random Forest
         n_jobs=-1,                  # usar todos los núcleos disponibles para acelerar el entrenamiento
-        random_state=42             # semilla para reproducibilidad
+        random_state=seed           # semilla para reproducibilidad
     )
 
     # se entrena el modelo con los datos de entrenamiento
@@ -79,33 +84,17 @@ def clasificadorCW(csv_path: str) -> dict:
     
     importancias = pd.Series(clf.feature_importances_, index=X_train.columns)
     top20 = importancias.sort_values(ascending=False).head(20)
+    
+    # Para mostrar valores medios de los features en el top 20
+    valores_medios = X_test.mean()
 
     tabla_top20 = pd.DataFrame({
         "ranking": range(1, len(top20) + 1),
         "feature": top20.index,
+        "Valor medio": [valores_medios[f] for f in top20.index], # valores medios de cada feature en el conjunto de test
         "descripcion": [nombre_feature(f) for f in top20.index],
         "importancia": top20.values,
     })
-
-    # PRUEBA CON LABELS BARAJADAS --> para comprobar que el modelo no está memorizando las etiquetas
-    # ESTO PORQUE ME DABA ACCURACY DEL 100% Y ME PARECÌA MUY PERFECTO Y ME DIJO CHATI QUE PODÍA
-    # PROBAR A BARAJAR LAS ETIQUETAS PARA VER SI EL MODELO SIGUE OBTENIENDO UN ALTO ACCURACY --> 
-    # SI OBTIENE UN ALTO ACCURACY CON LAS ETIQUETAS BARAJADAS, SIGNIFICA QUE EL MODELO ESTÁ MEMORIZANDO 
-    # LAS ETIQUETAS EN LUGAR DE APRENDER A GENERALIZAR A PARTIR DE LOS FEATURES
-    X_train_reset = X_train.reset_index(drop=True)
-    y_train_shuffle = y_train.sample(frac=1, random_state=123).reset_index(drop=True)
-
-    clf_shuffle = RandomForestClassifier(
-        n_estimators=100,
-        n_jobs=-1,
-        random_state=42
-    )
-
-    clf_shuffle.fit(X_train_reset, y_train_shuffle)
-    y_pred_shuffle = clf_shuffle.predict(X_test)
-
-    acc_shuffle = accuracy_score(y_test, y_pred_shuffle)
-    aciertos_shuffle = (y_pred_shuffle == y_test).sum()
     
     resultados = {
         "train_shape": df_train.shape,
@@ -116,27 +105,11 @@ def clasificadorCW(csv_path: str) -> dict:
         "aciertos": aciertos,
         "total_test": len(y_test),
         "matriz_confusion": cm,
-        "top20_features": top20,
-        "accuracy_shuffle": acc_shuffle,
-        "aciertos_shuffle": aciertos_shuffle,
-        "tabla_top20_features": tabla_top20
+        "tabla_top20_features": tabla_top20,
+        "seed": seed
     }
     
-    # gráficas :)
-    importancias = clf.feature_importances_
-    feature_names = list(X_train.columns)
-    
-    # para gráficas :)
-    resultados_graf = {
-    "y_test": y_test,
-    "y_pred": y_pred,
-    "labels": labels,
-    "df": df,
-    "feature_importances": importancias,
-    "feature_names": feature_names,
-    }
-    
-    return resultados, resultados_graf
+    return resultados
         
 def guardar_resultados(resultados: dict, output_path: str) -> None:
     with open(output_path, "w") as f:
@@ -145,6 +118,7 @@ def guardar_resultados(resultados: dict, output_path: str) -> None:
         f.write(f"Shape del conjunto de entrenamiento: {resultados['train_shape']}\n")
         f.write(f"Shape del conjunto de test: {resultados['test_shape']}\n")
         f.write(f"Intersección entre train y test: {resultados['interseccion_train_test']}\n")
+        f.write(f"Semilla utilizada: {resultados['seed']}\n")
         f.write("\nNúmero de muestras por clase:\n")
         f.write(str(resultados["cont_clases"]))
         f.write(f"\nAccuracy: {resultados['accuracy']:.4f}\n")
@@ -156,19 +130,17 @@ def guardar_resultados(resultados: dict, output_path: str) -> None:
         f.write("\nTop 20 features más importantes:\n")
         tabla = resultados["tabla_top20_features"]
 
-        f.write(f"{'Rank':<6}{'Feature':<18}{'Descripción':<40}{'Importancia':>12}\n")
-        f.write("-" * 76 + "\n")
+        f.write(f"{'Rank':<6}{'Feature':<18}{'Descripción':<40}{'Valor medio':<18}{'Importancia':>14}\n")
+        f.write("-" * 110 + "\n")
 
         for _, row in tabla.iterrows():
             f.write(
-                f"{row['ranking']:<6}"
-                f"{row['feature']:<18}"
-                f"{row['descripcion']:<40}"
-                f"{row['importancia']:>12.4f}\n"
+                f"{row['ranking']:<6} "
+                f"{row['feature']:<18} "
+                f"{row['descripcion']:<40} "
+                f"{row['Valor medio']:<18.4f} "
+                f"{row['importancia']:>14.6f}\n"
             )
-            
-        f.write(f"\nAccuracy con labels barajadas: {resultados['accuracy_shuffle']:.4f}\n")
-        f.write(f"Aciertos con labels barajadas: {resultados['aciertos_shuffle']} de {resultados['total_test']}\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Clasificador Random Forest Closed World")
@@ -179,9 +151,21 @@ if __name__ == "__main__":
         default="resultados_clasificador.txt",
         help="Ruta del archivo de salida (.txt)"
     )
+    parser.add_argument(
+        "--n_train", "-n",
+        type=int,
+        default=80,
+        help="Porcentaje de muestras para entrenamiento (1-99, default=80)"
+    )
+    parser.add_argument(
+        "--seed", "-s",
+        type=int,
+        default=42,
+        help="Semilla para la aleatorización (default=42)"
+    )
 
     args = parser.parse_args()
 
-    resultados, resultados_graf = clasificadorCW(args.csv)
+    resultados = clasificadorCW(args.csv, n_train=args.n_train, seed=args.seed)
     if args.output:
         guardar_resultados(resultados, args.output)

@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.env.local
 
 # Logs / outputs
 *.log
@@ -12,5 +13,4 @@ venv/
 
 # carpetas
 comprobaciones/
-
-.env.local
+datos/prueba1/
