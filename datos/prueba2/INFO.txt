@@ -1,5 +1,23 @@
-Prueba con todos los datos y todos los escenarios de captura (closed world)
+Prueba con todos los datos y todos los escenarios de captura (closed world).
+
+- Cada escenario cuenta con 10.000 pcaps --> 100 páginas (HTMLs) x 100 capturas cada uno.
 
 - Escenario 1 --> Páginas con tamaño y recurso variable
+
+        - Tamaño total de las páginas está comprendido entre 586 kB (percentil 10) y 10,4 MB (percentil 90).
+
 - Escenario 2 --> Páginas con tamaño total fijo y número de recursos variable.
+
+        - El tamaño total de las páginas es de 2,57 MB (tamaño medio total).
+        - Los recursos de las páginas varían entre 0 y 99 imágenes, es decir, la página 1 solo contiene el html, la página 2 el html + 1 imágen, ... y la página 100 el html + 99 imágenes.
+
 - Escenario 3 --> Páginas con tamaños y número de recursos fijo.
+
+        - Tamaño total de las páginas es de 2,57 MB.
+        - El número de recursos se divide en 3 escenarios:
+
+            1. Percentil 25 --> las páginas contienen 6 imágenes.
+            2. Percentil 50 --> las páginas contiene 14 imágenes.
+            3. Percentil 75 --> las páginas contienen 32 imágenes.
+
+        - Lo que distingue a las pàginas entr sì es la distribución de las imágenes dentro del tamaño del HTML (la distribución es al azar).
