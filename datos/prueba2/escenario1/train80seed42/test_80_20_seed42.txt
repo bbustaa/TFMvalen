@@ -4,6 +4,7 @@ Resultados del Clasificador Random Forest Closed World
 Shape del conjunto de entrenamiento: (8000, 36920)
 Shape del conjunto de test: (2000, 36920)
 Intersección entre train y test: 0
+Semilla utilizada: 42
 
 Número de muestras por clase:
 label
@@ -125,28 +126,25 @@ Matriz de confusión:
       0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0    20
 
 Top 20 features más importantes:
-Rank  Feature           Descripción                              Importancia
-----------------------------------------------------------------------------
-1     feature_18566     outgoing_size_freq_80                         0.0037
-2     feature_16455     incoming_size_freq_16401                      0.0034
-3     feature_18567     outgoing_size_freq_81                         0.0031
-4     feature_31        top20_leastfreq_incoming_size_17              0.0028
-5     feature_28        top20_leastfreq_incoming_size_14              0.0027
-6     feature_32        top20_leastfreq_incoming_size_18              0.0027
-7     feature_30        top20_leastfreq_incoming_size_16              0.0026
-8     feature_33        top20_leastfreq_incoming_size_19              0.0026
-9     feature_122       incoming_size_freq_68                         0.0024
-10    feature_18991     outgoing_size_freq_505                        0.0024
-11    feature_34        top20_leastfreq_incoming_size_20              0.0024
-12    feature_18993     outgoing_size_freq_507                        0.0023
-13    feature_7088      incoming_size_freq_7034                       0.0023
-14    feature_123       incoming_size_freq_69                         0.0022
-15    feature_4         burst_method1_max                             0.0022
-16    feature_27        top20_leastfreq_incoming_size_13              0.0021
-17    feature_26        top20_leastfreq_incoming_size_12              0.0021
-18    feature_15964     incoming_size_freq_15910                      0.0021
-19    feature_29        top20_leastfreq_incoming_size_15              0.0021
-20    feature_8780      incoming_size_freq_8726                       0.0021
-
-Accuracy con labels barajadas: 0.0090
-Aciertos con labels barajadas: 18 de 2000
+Rank  Feature           Descripción                             Valor medio          Importancia
+--------------------------------------------------------------------------------------------------------------
+1      feature_2          total_tls_bytes                          4285163.7525             0.006300
+2      feature_18565      outgoing_size_freq_79                    27.0725                  0.005878
+3      feature_18564      outgoing_size_freq_78                    17.5765                  0.005530
+4      feature_1          outgoing_tls_records                     156.8500                 0.005370
+5      feature_18516      outgoing_size_freq_30                    23.9110                  0.005280
+6      feature_16455      incoming_size_freq_16401                 238.9285                 0.005184
+7      feature_4          burst_method1_max                        617743.8965              0.005013
+8      feature_0          incoming_tls_records                     313.7245                 0.005000
+9      feature_18517      outgoing_size_freq_31                    71.5790                  0.004394
+10     feature_6          burst_method1_mean                       60966.6476               0.004130
+11     feature_5          burst_method1_std                        120923.2295              0.003955
+12     feature_13         distinct_incoming_sizes                  62.8020                  0.003885
+13     feature_10         burst_method2_blocks20_std               6.6960                   0.003727
+14     feature_18686      outgoing_size_freq_200                   0.8400                   0.003599
+15     feature_18990      outgoing_size_freq_504                   0.4100                   0.003525
+16     feature_11         burst_method2_blocks20_mean              13.0406                  0.003313
+17     feature_8          burst_method2_blocks20_min               1.1780                   0.002988
+18     feature_33         top20_leastfreq_incoming_size_19         4608.5365                0.002760
+19     feature_18991      outgoing_size_freq_505                   0.5000                   0.002613
+20     feature_39         top20_leastfreq_outgoing_size_5          194.9965                 0.002611

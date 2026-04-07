@@ -1,9 +1,10 @@
 Resultados del Clasificador Random Forest Closed World
-=====================================================
+
 
 Shape del conjunto de entrenamiento: (8000, 36920)
 Shape del conjunto de test: (2000, 36920)
 Intersección entre train y test: 0
+Semilla utilizada: 42
 
 Número de muestras por clase:
 label
@@ -125,26 +126,25 @@ Matriz de confusión:
       0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0    20
 
 Top 20 features más importantes:
-  feature_18566: 0.0037
-  feature_16455: 0.0034
-  feature_18567: 0.0031
-  feature_31: 0.0028
-  feature_28: 0.0027
-  feature_32: 0.0027
-  feature_30: 0.0026
-  feature_33: 0.0026
-  feature_122: 0.0024
-  feature_18991: 0.0024
-  feature_34: 0.0024
-  feature_18993: 0.0023
-  feature_7088: 0.0023
-  feature_123: 0.0022
-  feature_4: 0.0022
-  feature_27: 0.0021
-  feature_26: 0.0021
-  feature_15964: 0.0021
-  feature_29: 0.0021
-  feature_8780: 0.0021
-
-Accuracy con labels barajadas: 0.0090
-Aciertos con labels barajadas: 18 de 2000
+Rank  Feature           Descripción                             Valor medio          Importancia
+--------------------------------------------------------------------------------------------------------------
+1      feature_4          burst_method1_max                        912215.3585              0.006930
+2      feature_24         top20_leastfreq_incoming_size_10         6156.9980                0.006652
+3      feature_5          burst_method1_std                        227975.9619              0.006525
+4      feature_25         top20_leastfreq_incoming_size_11         8087.1015                0.006523
+5      feature_23         top20_leastfreq_incoming_size_9          4203.1305                0.006375
+6      feature_26         top20_leastfreq_incoming_size_12         9572.5975                0.006056
+7      feature_22         top20_leastfreq_incoming_size_8          2451.0880                0.005741
+8      feature_27         top20_leastfreq_incoming_size_13         9753.8795                0.005713
+9      feature_6          burst_method1_mean                       105217.5295              0.005210
+10     feature_193        incoming_size_freq_139                   0.4200                   0.004893
+11     feature_18516      outgoing_size_freq_30                    5.2640                   0.004834
+12     feature_20         top20_leastfreq_incoming_size_6          393.2695                 0.004791
+13     feature_28         top20_leastfreq_incoming_size_14         7380.6640                0.004636
+14     feature_21         top20_leastfreq_incoming_size_7          1088.9575                0.004624
+15     feature_1          outgoing_tls_records                     25.2175                  0.004486
+16     feature_11         burst_method2_blocks20_mean              17.6596                  0.004272
+17     feature_194        incoming_size_freq_140                   0.2680                   0.004174
+18     feature_18         top20_leastfreq_incoming_size_4          73.5785                  0.004146
+19     feature_19         top20_leastfreq_incoming_size_5          134.7680                 0.004131
+20     feature_16455      incoming_size_freq_16401                 160.7560                 0.003988
