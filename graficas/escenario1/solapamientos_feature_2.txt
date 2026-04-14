@@ -1,0 +1,10 @@
+Resumen de solapamientos — Feature: feature_2
+Tolerancia: 0.0
+Total coincidencias: 3
+Pares de páginas con solapamiento: 3
+
+Par de páginas                            Solapamientos
+--------------------------------------------------------
+pagina_10 <-> pagina_65                              1
+pagina_100 <-> pagina_37                              1
+pagina_52 <-> pagina_96                              1
