@@ -72,6 +72,37 @@ def graficar_boxplot(df: pd.DataFrame, output_path: str) -> None:
     print(f"Boxplot guardado en: {output_path}")
 
 
+def graficar_cv(df: pd.DataFrame, output_path: str) -> None:
+
+    stats = (
+        df.groupby(["pagina", "pagina_num"])["bytes"]
+        .agg(media="mean", std="std")
+        .reset_index()
+    )
+    stats["cv"] = (stats["std"] / stats["media"] * 100).fillna(0)
+    stats = stats.sort_values("pagina_num")
+
+    n = len(stats)
+    fig_width = max(20, n * 0.28)
+    fig, ax = plt.subplots(figsize=(fig_width, 6))
+
+    colores = ["tomato" if cv > 10 else "steelblue" for cv in stats["cv"]]
+    ax.bar(range(n), stats["cv"], color=colores, alpha=0.8, width=0.7)
+
+    ax.axhline(stats["cv"].mean(), color="black", linestyle="--", linewidth=1.2, label=f"Media CV = {stats['cv'].mean():.1f}%")
+    ax.set_xticks(range(n))
+    ax.set_xticklabels([p.replace("page_", "p") for p in stats["pagina"]], rotation=90, fontsize=7)
+    ax.set_xlabel("Página", fontsize=12, labelpad=8)
+    ax.set_ylabel("Coeficiente de variación (%)", fontsize=12, labelpad=8)
+    ax.set_title("Variabilidad del tamaño de imágenes por página (CV)\nRojo = CV > 10% (páginas más inestables)", fontsize=14, pad=12)
+    ax.legend(fontsize=10)
+    ax.grid(axis="y", linestyle="--", alpha=0.5)
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close()
+    print(f"CV plot guardado en: {output_path}")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualización de tamaños de imágenes por página")
     parser.add_argument("escenario", help="Ruta al directorio del escenario (ej: escenario1/webFingerprint01)")
@@ -83,4 +114,5 @@ if __name__ == "__main__":
 
     df = recopilar_tamanios(args.escenario)
 
-    graficar_boxplot(df, os.path.join(args.output_dir, f"{nombre_escenario}_boxplot_tamanios.png"))
+    #graficar_boxplot(df, os.path.join(args.output_dir, f"{nombre_escenario}_boxplot_tamanios.png"))
+    graficar_cv(df,      os.path.join(args.output_dir, f"{nombre_escenario}_cv_tamanios.png"))
