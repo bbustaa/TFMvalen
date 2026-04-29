@@ -17,13 +17,13 @@ def graficar_mapa_calor(cm: np.ndarray, labels: list, output_dir: str, nombre_ar
         cm_norm = np.nan_to_num(cm_norm)  # por si alguna clase tiene 0 muestras en test
 
     # Tamaño dinámico según número de clases
-    fig_size = max(12, n_clases * 0.5)
+    fig_size = max(14, n_clases * 0.6)
     fig, ax = plt.subplots(figsize=(fig_size, fig_size))
 
     sns.heatmap(
         cm_norm,
         ax=ax,
-        cmap="Blues",           # azul más intenso = más aciertos
+        cmap="Reds",            # rojo más intenso = más aciertos
         vmin=0.0,
         vmax=1.0,
         xticklabels=labels,
@@ -35,12 +35,16 @@ def graficar_mapa_calor(cm: np.ndarray, labels: list, output_dir: str, nombre_ar
         fmt=".2f" if n_clases <= 30 else "",
     )
 
-    ax.set_xlabel("Clase predicha", fontsize=13, labelpad=12, color="black", fontweight="bold")
-    ax.set_ylabel("Clase real", fontsize=13, labelpad=12, color="black", fontweight="bold")
+    tick_fontsize = max(7, 11 - n_clases // 12)
 
-    # Rotar etiquetas para que sean legibles
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=max(6, 10 - n_clases // 15))
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=max(6, 10 - n_clases // 15))
+    ax.set_xlabel("Clase predicha", fontsize=13, labelpad=15, color="black", fontweight="bold")
+    ax.set_ylabel("Clase real", fontsize=13, labelpad=15, color="black", fontweight="bold")
+
+    # Rotación 90° en X: más compacta que 45° cuando hay muchas clases
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="center", fontsize=tick_fontsize)
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0, va="center", fontsize=tick_fontsize)
+    ax.tick_params(axis="x", pad=4)
+    ax.tick_params(axis="y", pad=4)
 
     plt.tight_layout()
 
