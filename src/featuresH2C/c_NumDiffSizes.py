@@ -1,5 +1,31 @@
 import a_ConnStats
 
+
+def obtener_tamanos_from_frames(frames, client_ip):
+    """
+    Devuelve (incoming_sizes, outgoing_sizes) a partir de frames ya extraídos.
+    """
+    incoming_sizes = []
+    outgoing_sizes = []
+
+    for frame in frames:
+        ip_src = frame["ip_src"]
+        ip_dst = frame["ip_dst"]
+        record_lengths = frame["record_lengths"]
+
+        if ip_src != client_ip and ip_dst != client_ip:
+            continue
+        if not record_lengths:
+            continue
+
+        if ip_src == client_ip:
+            outgoing_sizes.extend(record_lengths)
+        else:
+            incoming_sizes.extend(record_lengths)
+
+    return incoming_sizes, outgoing_sizes
+
+
 def obtener_tamanos_tls_incoming_outgoing(pcap_file, client_ip):
     """
     Devuelve dos listas con todos los tamaños de TLS records:

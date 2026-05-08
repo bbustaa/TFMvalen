@@ -1,13 +1,10 @@
 import subprocess
 from collections import defaultdict
 
-TSHARK_PATH = r"C:\Program Files\Wireshark\tshark.exe"
+TSHARK_PATH = r"/usr/bin/tshark"
 
 
-def extraer_info_tls_por_frame(pcap_file):
-    """
-    Extrae información TLS de cada frame del PCAP usando TShark.
-    """
+def extraer_frames_tls(pcap_file):
 
     cmd = [
         TSHARK_PATH,
@@ -63,6 +60,39 @@ def extraer_info_tls_por_frame(pcap_file):
     return frames
 
 
+# alias para compatibilidad con código antiguo
+extraer_info_tls_por_frame = extraer_frames_tls
+
+
+def calcular_conn_stats(frames, client_ip):
+    """
+    Calcula (total_incoming_records, total_outgoing_records, total_tls_bytes)
+    a partir de frames ya extraídos.
+    """
+    total_incoming = 0
+    total_outgoing = 0
+    total_bytes = 0
+
+    for frame in frames:
+        ip_src = frame["ip_src"]
+        ip_dst = frame["ip_dst"]
+        record_lengths = frame["record_lengths"]
+
+        if ip_src != client_ip and ip_dst != client_ip:
+            continue
+        if not record_lengths:
+            continue
+
+        if ip_src == client_ip:
+            total_outgoing += len(record_lengths)
+        else:
+            total_incoming += len(record_lengths)
+
+        total_bytes += sum(record_lengths)
+
+    return total_incoming, total_outgoing, total_bytes
+
+
 def contar_tls_records_por_conexion(pcap_file, client_ip):
     """
     Cuenta estadísticas TLS por conexión en la que participa el cliente --> incoming/outgoing tls records
@@ -75,7 +105,7 @@ def contar_tls_records_por_conexion(pcap_file, client_ip):
         "total_tls_bytes": 0
     })
 
-    frames = extraer_info_tls_por_frame(pcap_file)
+    frames = extraer_frames_tls(pcap_file)
 
     for frame in frames:
         ip_src = frame["ip_src"]

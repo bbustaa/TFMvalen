@@ -1,6 +1,62 @@
 import statistics
 import a_ConnStats
 
+BURST_BLOCK_SIZE = 20
+
+
+def calcular_bursts_b2(frames, client_ip, server_ip, server_port):
+    """
+    Número de TLS records del servidor en cada bloque de 20 records (cliente+servidor)
+    de la conexión cliente↔servidor:server_port.
+
+    Acepta frames ya extraídos (lista devuelta por a_ConnStats.extraer_frames_tls).
+    """
+    secuencia = []
+
+    for frame in frames:
+        ip_src = frame["ip_src"]
+        ip_dst = frame["ip_dst"]
+        src_port = frame["src_port"]
+        dst_port = frame["dst_port"]
+        record_lengths = frame["record_lengths"]
+
+        if not record_lengths:
+            continue
+
+        pertenece = (
+            (ip_src == client_ip and ip_dst == server_ip and dst_port == str(server_port)) or
+            (ip_src == server_ip and ip_dst == client_ip and src_port == str(server_port))
+        )
+
+        if not pertenece:
+            continue
+
+        num_records = len(record_lengths)
+        if ip_src == server_ip:
+            secuencia.append(('S', num_records))
+        else:
+            secuencia.append(('C', num_records))
+
+    bloques = []
+    cont_s = 0
+    bloque_cont = 0
+
+    for origen, n in secuencia:
+        restante = n
+        while restante > 0:
+            espacio = BURST_BLOCK_SIZE - bloque_cont
+            tomar = min(restante, espacio)
+            if origen == 'S':
+                cont_s += tomar
+            bloque_cont += tomar
+            restante -= tomar
+            if bloque_cont == BURST_BLOCK_SIZE:
+                bloques.append(cont_s)
+                bloque_cont = 0
+                cont_s = 0
+
+    return bloques
+
 
 def construir_secuencia_tls_por_conexion(pcap_file, client_ip, server_ip, server_port):
     """

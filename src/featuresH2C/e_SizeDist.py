@@ -2,6 +2,35 @@ import a_ConnStats
 
 MAX_TLS_RECORD_SIZE = 18432
 
+
+def calcular_distribucion_from_frames(frames, client_ip):
+    """
+    Calcula (incoming_freq, outgoing_freq) a partir de frames ya extraídos.
+    Cada lista tiene MAX_TLS_RECORD_SIZE = 18432 posiciones.
+    """
+    incoming_freq = [0] * MAX_TLS_RECORD_SIZE
+    outgoing_freq = [0] * MAX_TLS_RECORD_SIZE
+
+    for frame in frames:
+        ip_src = frame["ip_src"]
+        ip_dst = frame["ip_dst"]
+        record_lengths = frame["record_lengths"]
+
+        if ip_src != client_ip and ip_dst != client_ip:
+            continue
+
+        for tam in record_lengths:
+            if not (1 <= tam <= MAX_TLS_RECORD_SIZE):
+                continue
+            indice = tam - 1
+            if ip_src == client_ip:
+                outgoing_freq[indice] += 1
+            else:
+                incoming_freq[indice] += 1
+
+    return incoming_freq, outgoing_freq
+
+
 def calcular_distribucion_tamanos_tls(pcap_file, client_ip):
     """
     Calcula la distribución de tamaños de TLS records para tráfico incoming y outgoing --> vector con las frecuencias de todos
