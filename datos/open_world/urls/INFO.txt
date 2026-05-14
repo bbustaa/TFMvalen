@@ -1,0 +1,297 @@
+TIFICACIÓN DEL PROCESO DE FILTRADO DE URLs PARA WEBSITE FINGERPRINTING
+  TFM - Open World Scenario
+========================================================================
+
+OBJETIVO DEL FILTRADO
+----------------------
+El objetivo del experimento es Website Fingerprinting (WF) en un escenario
+open-world, donde se quiere modelar el comportamiento real de un usuario
+navegando intencionalmente a páginas web que ofrecen un servicio concreto
+(redes sociales, plataformas de contenido, servicios de productividad,
+tiendas online, medios de comunicación, etc.).
+
+El criterio para incluir una URL es:
+  "¿Un usuario abre el navegador y navega intencionalmente a esta página?"
+
+
+========================================================================
+PASO 1: listado_urls.txt → listado_limpio.txt  (150 → ~110 URLs)
+========================================================================
+
+En este primer paso se eliminaron dominios de infraestructura
+de red y entrega de contenido que nunca generan tráfico iniciado por
+un usuario navegando directamente:
+
+  ELIMINADOS - Infraestructura de edge/routing de Microsoft:
+    a-msedge.net, akamaiedge.net, l-msedge.net, t-msedge.net,
+    dual-s-msedge.net, ax-msedge.net, wac-msedge.net, spo-msedge.net,
+    msedge.net
+    → Red de entrega de contenido de Microsoft Edge. El usuario nunca
+      resuelve estos dominios directamente; aparecen como saltos
+      intermedios en la resolución DNS de servicios Microsoft.
+
+  ELIMINADOS - CDNs de terceros genéricos:
+    tiktokcdn.com, tiktokrow-cdn.com, fbcdn.net, cdninstagram.com,
+    rbxcdn.com, aiv-cdn.net, rocket-cdn.com, cdn77.org, cdn90.cn,
+    bytefcdn-oversea.com, edgesuite.net, edgekey.net
+    → CDNs de entrega de contenido multimedia. Generan tráfico de fondo
+      cuando el usuario visita la plataforma principal (TikTok, Facebook,
+      Roblox, etc.) pero no son destinos navegables por sí mismos.
+
+  ELIMINADOS - Infraestructura DNS y resolución:
+    root-servers.net, gtld-servers.net, akadns.net, apple-dns.net,
+    dns.google, ntp.org
+    → Servidores raíz DNS, servidores de tiempo y resolución de nombres.
+      Tráfico completamente automatizado, invisible para el usuario.
+
+  ELIMINADOS - Servicios de publicidad y tracking puro:
+    doubleclick.net, google-analytics.com, googlesyndication.com,
+    googletagmanager.com, amazon-adsystem.com, adnxs.com,
+    app-analytics-services.com
+    → Pixels de seguimiento y redes publicitarias. Se cargan en segundo
+      plano al visitar otras páginas pero no son destinos de navegación.
+
+  ELIMINADOS - CDNs auxiliares de plataformas:
+    gstatic.com, googleapis.com (CDN de assets de Google),
+    gvt1.com, gvt2.com (Google Video entrega de actualizaciones),
+    userapi.com (CDN de VK), okcdn.ru (CDN de Odnoklassniki),
+    cdn20.com, speedcdns.com
+    → Dominios auxiliares de grandes plataformas usados exclusivamente
+      para servir assets estáticos o actualizaciones de software.
+
+  ELIMINADOS - Infraestructura de red de operadores:
+    trafficmanager.net (Azure Traffic Manager, balanceo de carga),
+    domaincontrol.com (nameservers de GoDaddy)
+
+  ELIMINADOS - SDKs y herramientas de desarrollo/analítica:
+    appsflyersdk.com (SDK de atribución móvil),
+    app-measurement.com (Firebase Analytics),
+    sentry.io (monitorización de errores),
+    criteo.com (plataforma de retargeting),
+    digicert.com (autoridad de certificación),
+    pki.goog (infraestructura PKI de Google),
+    msftncsi.com (Network Connectivity Status Indicator de Windows)
+    → Tráfico generado automáticamente por apps o el SO, no por el usuario.
+
+========================================================================
+PASO 2: listado_limpio.txt → listado_solo_paginas.txt  (~110 → 95 URLs)
+========================================================================
+
+Se mantuvieron únicamente dominios con interfaz web navegable por el
+usuario final. Se eliminaron los restantes dominios técnicos/auxiliares
+que habían sobrevivido al primer filtrado.
+
+========================================================================
+PASO 3: listado_solo_paginas.txt → listado_final.txt  (95 → 65 URLs)
+========================================================================
+
+Revisión fina aplicando estrictamente el criterio de navegación
+intencional. Se eliminaron los siguientes dominios con justificación
+específica:
+
+  --- CDNs / Infraestructura de entrega que sobrevivieron al filtrado ---
+
+  akamai.net
+    → Akamai es una empresa de CDN e infraestructura de red. El dominio
+      akamai.net no tiene interfaz de usuario navegable; es el backend
+      de entrega de contenido de miles de sitios. Un usuario nunca
+      teclea akamai.net en el navegador.
+
+  cloudflare.com / cloudflare.net
+    → Cloudflare ofrece servicios a empresas (CDN, DDoS, DNS). Aunque
+      tiene web corporativa, el tráfico capturado en PCAP corresponde
+      mayoritariamente a resolución de DNS-over-HTTPS (1.1.1.1) o
+      tráfico proxy, no a navegación de usuario. Se elimina por
+      ambigüedad y porque contaminaría el modelo.
+
+  cloudfront.net
+    → CDN de Amazon Web Services. Dominio de entrega de contenido puro;
+      nunca es un destino de usuario.
+
+  fastly.net
+    → CDN de Fastly. Igual que cloudfront.net, es infraestructura de
+      entrega, no una página navegable.
+
+  workers.dev
+    → Plataforma serverless de Cloudflare para desarrolladores. No es
+      una página de usuario final; aloja funciones backend de terceros.
+
+  amazonaws.com
+    → Backend de Amazon Web Services (S3, EC2, etc.). Aunque genera
+      mucho tráfico, ningún usuario navega a amazonaws.com; el tráfico
+      es generado por apps y servicios que usan AWS como hosting.
+
+  googlevideo.com
+    → CDN de entrega de vídeo de YouTube. El usuario navega a
+      youtube.com; googlevideo.com aparece en las capturas como dominio
+      auxiliar de streaming, no como destino independiente.
+
+  ytimg.com
+    → CDN de imágenes y thumbnails de YouTube. Dominio auxiliar,
+      mismo razonamiento que googlevideo.com.
+
+  googleusercontent.com
+    → CDN de contenido generado por usuarios en servicios de Google
+      (Drive, Gmail attachments, etc.). No es navegable directamente.
+
+  yandex.net
+    → Infraestructura de red de Yandex (≠ yandex.ru o yandex.com).
+      Es el dominio de CDN y servidores internos de Yandex, no la
+      página de búsqueda o servicios al usuario.
+
+  windows.net
+    → Dominio de Azure para endpoints de servicios Microsoft (Azure
+      Blob Storage, Azure AD, etc.). Tráfico automatizado de apps y
+      servicios, no navegación de usuario.
+
+  tiktokv.com
+    → CDN de entrega de vídeo de TikTok. El usuario navega a tiktok.com;
+      tiktokv.com es el dominio de streaming de vídeo auxiliar.
+
+  --- Dominios técnicos / de sistema / registro ---
+
+  windowsupdate.com
+    → Actualizaciones automáticas de Windows. Tráfico 100% generado
+      por el SO en segundo plano, el usuario no interactúa con él.
+
+  e2ro.com
+    → Backend y firmware de routers Amazon Eero. Tráfico de gestión
+      de red doméstica, invisible para el usuario.
+
+  myfritz.net
+    → Servicio DDNS (Dynamic DNS) de routers AVM Fritz!Box. Tráfico
+      de red doméstica automatizado.
+
+  nic.ru
+    → Registrador de dominios .ru. Aunque tiene web, el tráfico en
+      capturas de red corresponde a consultas DNS de resolución de
+      dominios .ru, no a navegación de usuario a la web del registrador.
+
+  gandi.net
+    → Registrador de dominios internacional. Mismo razonamiento que
+      nic.ru. Tráfico en PCAP es DNS, no navegación web.
+
+  googledomains.com
+    → Servicio de registro de dominios de Google (cerrado en 2023,
+      migrado a Squarespace). No es un destino de usuario habitual.
+
+  --- Acortadores y redirecciones sin contenido propio ---
+
+  goo.gl
+    → Acortador de URLs de Google, oficialmente deprecado desde 2019
+      y cerrado para nuevos links desde 2022. Redirige a la URL final;
+      no tiene contenido propio. Además, el tráfico de resolución de
+      goo.gl en una captura es indistinguible entre millones de destinos
+      finales posibles.
+
+  bit.ly
+    → Acortador de URLs. Mismo razonamiento que goo.gl: el tráfico
+      de bit.ly es una redirección, no una página con huella propia.
+
+  wa.me
+    → Dominio de links directos a WhatsApp ("Click to Chat"). Redirige
+      a la app o a web.whatsapp.com. No tiene contenido propio navegable.
+
+  youtu.be
+    → Acortador oficial de YouTube. Redirige a youtube.com/watch?v=...
+      La huella de tráfico real es de YouTube, no de youtu.be.
+
+  a2z.com
+    → Redirige a amazon.com. Dominio histórico de Amazon sin contenido
+      propio. La huella de tráfico es de amazon.com.
+
+  --- Dominios auxiliares / duplicados de servicios ya incluidos ---
+
+  office.net
+    → Dominio secundario de Microsoft Office 365. El usuario accede
+      a través de office.com o microsoftonline.com (ambos incluidos).
+      office.net es un dominio auxiliar de entrega de assets.
+
+  telekom.net
+    → Dominio técnico de Deutsche Telekom, distinto de telekom.de
+      (web de cliente, incluida). telekom.net se usa para
+      infraestructura interna de red.
+
+  --- Otros eliminados ---
+
+  health.mil
+    → Portal médico militar de EE.UU. Tráfico muy específico y
+      restringido; no representa un patrón de navegación generalizable
+      en un escenario open-world.
+
+  gravatar.com
+    → Servicio de avatares globales para WordPress y otros CMS. El
+      usuario no navega a gravatar.com; las imágenes se cargan
+      automáticamente en segundo plano al visitar blogs.
+
+  macromedia.com
+    → Dominio obsoleto de Macromedia (absorbida por Adobe en 2005).
+      Redirige a adobe.com (ya incluido). El tráfico que genera es
+      de redirecciones de Flash/Shockwave antiguas.
+
+  nginx.org / nginx.com
+    → Documentación técnica del servidor web Nginx. Aunque es navegable,
+      es un recurso de desarrolladores/administradores de sistemas,
+      no de usuarios finales generales. No encaja en el perfil open-world.
+
+  apache.org
+    → Documentación técnica de la Apache Software Foundation. Mismo
+      razonamiento que nginx.org.
+
+  googleadservices.com
+    → Plataforma de gestión de anuncios de Google (Google Ads). Genera
+      tráfico de carga de pixels y redirects publicitarios, no de
+      navegación de usuario a una página de servicio.
+
+========================================================================
+RESUMEN DE ESTADÍSTICAS DE FILTRADO
+========================================================================
+
+  Listado original (listado_urls.txt):          150 URLs
+  Tras Paso 1 (listado_limpio.txt):             ~110 URLs
+  Tras Paso 2 (listado_solo_paginas.txt):        95 URLs
+  Listado final (listado_final.txt):             65 URLs
+
+========================================================================
+CATEGORÍAS REPRESENTADAS EN EL LISTADO FINAL
+========================================================================
+
+  Motores de búsqueda:       google.com, bing.com, yahoo.com, baidu.com,
+                             dzen.ru (Yandex News)
+
+  Redes sociales:            facebook.com, instagram.com, twitter.com,
+                             x.com, linkedin.com, pinterest.com,
+                             snapchat.com, tiktok.com, reddit.com,
+                             tumblr.com, flickr.com, vk.com, qq.com,
+                             t.me (Telegram)
+
+  Vídeo / Streaming:         youtube.com, netflix.com, vimeo.com,
+                             spotify.com
+
+  Mensajería:                whatsapp.com, whatsapp.net, skype.com
+
+  Plataformas Microsoft:     microsoft.com, office.com, office365.com,
+                             outlook.com, sharepoint.com,
+                             microsoftonline.com, live.com, msn.com,
+                             windows.com, azure.com
+
+  Plataformas Google:        (google.com, youtube.com ya en otras cat.)
+
+  Plataformas Apple:         apple.com, icloud.com
+
+  E-commerce / Servicios:    amazon.com, adobe.com, dropbox.com,
+                             zoom.us, intuit.com, samsung.com,
+                             xiaomi.com, epicgames.com, roblox.com,
+                             unity3d.com, opera.com, spotify.com
+
+  Noticias / Medios:         nytimes.com, t-online.de, blogspot.com,
+                             msn.com, europa.eu
+
+  Desarrollo / Tecnología:   github.com, github.io, mozilla.org,
+                             wordpress.com, wordpress.org
+
+  Telecomunicaciones:        telekom.de, mts.ru, mail.ru
+
+  Institucional / Gobierno:  nist.gov, nih.gov
+
+  Otros servicios:           wikipedia.org, baidu.com
