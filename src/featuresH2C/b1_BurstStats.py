@@ -24,8 +24,8 @@ def calcular_bursts_b1(frames, client_ip, server_ip, server_port):
             continue
 
         conexion = (
-            (ip_src == client_ip and ip_dst == server_ip and dst_port == str(server_port)) or
-            (ip_src == server_ip and ip_dst == client_ip and src_port == str(server_port))
+            (ip_src == client_ip and dst_port == str(server_port)) or
+            (ip_dst == client_ip and src_port == str(server_port))
         )
 
         if not conexion:
@@ -77,8 +77,8 @@ def imprimir_resultados(bursts):
 
 if __name__ == "__main__":
     pcap_file = r"datos/escenario1/captura_10000_10000.pcap"
-    client_ip = "172.16.56.2"
-    server_ip = "172.16.56.1"
+    client_ip = "10.6.56.13"
+    server_ip = ""
     server_port = 443
 
     frames = a_ConnStats.extraer_frames_tls(pcap_file)

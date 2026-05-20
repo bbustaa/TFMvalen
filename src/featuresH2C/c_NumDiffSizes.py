@@ -75,7 +75,7 @@ def contar_numero_tamanos_tls_distintos(pcap_file, client_ip):
 
 if __name__ == "__main__":
     pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
-    client_ip = "172.16.56.2"
+    client_ip = "10.6.56.13"
 
     resultados = contar_numero_tamanos_tls_distintos(pcap_file, client_ip)
 

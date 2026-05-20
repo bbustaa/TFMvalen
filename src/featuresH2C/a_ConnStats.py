@@ -158,7 +158,7 @@ def imprimir_resultados(stats):
 
 if __name__ == "__main__":
     pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
-    client_ip = "172.16.56.2"
+    client_ip = "10.6.56.13"
 
     stats = contar_tls_records_por_conexion(pcap_file, client_ip)
     imprimir_resultados(stats)

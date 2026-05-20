@@ -24,15 +24,15 @@ def calcular_bursts_b2(frames, client_ip, server_ip, server_port):
             continue
 
         pertenece = (
-            (ip_src == client_ip and ip_dst == server_ip and dst_port == str(server_port)) or
-            (ip_src == server_ip and ip_dst == client_ip and src_port == str(server_port))
+            (ip_src == client_ip and dst_port == str(server_port)) or
+            (ip_dst == client_ip and src_port == str(server_port))
         )
 
         if not pertenece:
             continue
 
         num_records = len(record_lengths)
-        if ip_src == server_ip:
+        if ip_src != client_ip:
             secuencia.append(('S', num_records))
         else:
             secuencia.append(('C', num_records))
@@ -81,8 +81,8 @@ def construir_secuencia_tls_por_conexion(pcap_file, client_ip, server_ip, server
 
         # Nos quedamos solo con la conexión concreta
         pertenece = (
-            (ip_src == client_ip and ip_dst == server_ip and dst_port == str(server_port)) or
-            (ip_src == server_ip and ip_dst == client_ip and src_port == str(server_port))
+            (ip_src == client_ip and dst_port == str(server_port)) or
+            (ip_dst == client_ip and src_port == str(server_port))
         )
 
         if not pertenece:
@@ -93,9 +93,9 @@ def construir_secuencia_tls_por_conexion(pcap_file, client_ip, server_ip, server
             continue
 
         # Añadimos una marca por cada TLS record del frame
-        if ip_src == server_ip:
+        if ip_src != client_ip:
             secuencia.extend(["S"] * num_records)
-        elif ip_src == client_ip:
+        else:
             secuencia.extend(["C"] * num_records)
 
     return secuencia
@@ -178,8 +178,8 @@ def imprimir_resultados(valores):
 
 if __name__ == "__main__":
     pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
-    client_ip = "172.16.56.2"
-    server_ip = "172.16.56.1"
+    client_ip = "10.6.56.13"
+    server_ip = ""
     server_port = 443
 
     valores = calcular_num_records_servidor_por_bloques_de_20(

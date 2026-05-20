@@ -165,8 +165,8 @@ def procesarDirectorioOW(
         print(f"Ficheros con errores: {errores}")
 
 if __name__ == "__main__":
-    client_ip = "172.16.56.2"
-    server_ip = "172.16.56.1"
+    client_ip = "10.6.56.13"
+    server_ip = ""
     server_port = 443
 
     parser = argparse.ArgumentParser(

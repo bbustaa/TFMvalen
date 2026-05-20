@@ -99,7 +99,7 @@ def imprimir_resumen(resultados):
 
 if __name__ == "__main__":
     pcap_file = r"datos\escenario1\captura_10000_10000.pcap"
-    client_ip = "172.16.56.2"
+    client_ip = "10.6.56.13"
 
     resultados = calcular_distribucion_tamanos_tls(pcap_file, client_ip)
     imprimir_resumen(resultados)
