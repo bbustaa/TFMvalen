@@ -1,0 +1,113 @@
+Resumen de solapamiento N-dimensional
+=====================================
+
+CSV: datos/closed_world/escenario1/features.csv
+Nº de features: 5
+Features usadas: feature_2, feature_18565, feature_18564, feature_1, feature_18516
+
+Páginas analizadas: 100
+Páginas con solapamiento: 13 / 100
+Porcentaje de solapamiento: 13.00 %
+Nº de pares solapados: 7
+
+Flags por página:
+pagina_1: 0
+pagina_2: 0
+pagina_3: 1
+pagina_4: 0
+pagina_5: 0
+pagina_6: 0
+pagina_7: 0
+pagina_8: 1
+pagina_9: 0
+pagina_10: 0
+pagina_11: 0
+pagina_12: 0
+pagina_13: 0
+pagina_14: 0
+pagina_15: 0
+pagina_16: 0
+pagina_17: 0
+pagina_18: 0
+pagina_19: 0
+pagina_20: 0
+pagina_21: 0
+pagina_22: 0
+pagina_23: 0
+pagina_24: 0
+pagina_25: 0
+pagina_26: 0
+pagina_27: 0
+pagina_28: 0
+pagina_29: 0
+pagina_30: 1
+pagina_31: 0
+pagina_32: 0
+pagina_33: 0
+pagina_34: 1
+pagina_35: 0
+pagina_36: 0
+pagina_37: 1
+pagina_38: 0
+pagina_39: 0
+pagina_40: 1
+pagina_41: 0
+pagina_42: 0
+pagina_43: 0
+pagina_44: 0
+pagina_45: 0
+pagina_46: 0
+pagina_47: 0
+pagina_48: 0
+pagina_49: 0
+pagina_50: 0
+pagina_51: 0
+pagina_52: 0
+pagina_53: 0
+pagina_54: 0
+pagina_55: 0
+pagina_56: 0
+pagina_57: 0
+pagina_58: 1
+pagina_59: 0
+pagina_60: 1
+pagina_61: 1
+pagina_62: 0
+pagina_63: 0
+pagina_64: 0
+pagina_65: 0
+pagina_66: 0
+pagina_67: 0
+pagina_68: 0
+pagina_69: 0
+pagina_70: 0
+pagina_71: 0
+pagina_72: 1
+pagina_73: 0
+pagina_74: 0
+pagina_75: 0
+pagina_76: 0
+pagina_77: 0
+pagina_78: 1
+pagina_79: 0
+pagina_80: 0
+pagina_81: 0
+pagina_82: 0
+pagina_83: 0
+pagina_84: 1
+pagina_85: 0
+pagina_86: 0
+pagina_87: 0
+pagina_88: 0
+pagina_89: 0
+pagina_90: 1
+pagina_91: 0
+pagina_92: 0
+pagina_93: 0
+pagina_94: 0
+pagina_95: 0
+pagina_96: 0
+pagina_97: 0
+pagina_98: 0
+pagina_99: 0
+pagina_100: 0
