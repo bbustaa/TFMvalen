@@ -1,4 +1,6 @@
-import sys, os
+import sys
+import os
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -194,11 +196,18 @@ def plot_group_3d(ax, pages, stats, overlap_flags, fx, fy, fz, colormap):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    if len(sys.argv) != 6:
-        print(__doc__)
-        sys.exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('csv_path')
+    parser.add_argument('fx')
+    parser.add_argument('fy')
+    parser.add_argument('fz')
+    parser.add_argument('output_dir')
+    parser.add_argument('--n_pages', type=int, default=None,
+                        help='Número máximo de páginas a graficar (por defecto todas)')
+    args = parser.parse_args()
 
-    csv_path, fx, fy, fz, output_dir = sys.argv[1:]
+    csv_path, fx, fy, fz, output_dir = (
+        args.csv_path, args.fx, args.fy, args.fz, args.output_dir)
 
     if not os.path.isfile(csv_path):
         print(f"[ERROR] CSV no encontrado: {csv_path}"); sys.exit(1)
@@ -218,7 +227,11 @@ def main():
     if not pages:
         print("[ERROR] No se encontraron etiquetas pagina_1..pagina_100."); sys.exit(1)
 
-    print(f"Páginas: {len(pages)}  |  X={fx}  Y={fy}  Z={fz}")
+    if args.n_pages is not None:
+        pages = pages[:args.n_pages]
+        print(f"Limitando a {args.n_pages} páginas (--n_pages)")
+
+    print(f"Páginas a graficar: {len(pages)}  |  X={fx}  Y={fy}  Z={fz}")
     print("Calculando rangos limpios (IQR)...")
     stats = compute_stats(df, fx, fy, fz, pages)
 
@@ -232,13 +245,13 @@ def main():
     groups   = [pages[i:i+20] for i in range(0, len(pages), 20)]
     n_groups = len(groups)
 
-    fig = plt.figure(figsize=(7.5 * n_groups, 8), facecolor='white')
+    fig = plt.figure(figsize=(8, 7.5 * n_groups), facecolor='white')
 
     colormap   = plt.get_cmap('tab20b')
     group_sums = []
 
     for idx, group in enumerate(groups):
-        ax = fig.add_subplot(1, n_groups, idx+1, projection='3d')
+        ax = fig.add_subplot(n_groups, 1, idx+1, projection='3d')
         g_sum = plot_group_3d(ax, group, stats, overlap_flags,
                               fx, fy, fz, colormap)
         group_sums.append(g_sum)
@@ -259,9 +272,10 @@ def main():
         fontfamily='monospace', y=1.03
     )
 
-    plt.tight_layout(w_pad=2.5)
+    plt.tight_layout(h_pad=2.5)
 
-    out = os.path.join(output_dir, f'scatter3d_{fx}__{fy}__{fz}.png')
+    suffix = f'_top{len(pages)}' if args.n_pages is not None else ''
+    out = os.path.join(output_dir, f'scatter3d_{fx}__{fy}__{fz}{suffix}.png')
     plt.savefig(out, dpi=150, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     plt.close()

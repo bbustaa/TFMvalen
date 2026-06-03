@@ -1,5 +1,6 @@
 import sys
 import os
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -198,14 +199,19 @@ def plot_group_2d(ax, pages, stats, overlap_flags, feat_x, feat_y, colormap):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    if len(sys.argv) != 5:
-        print(__doc__)
-        sys.exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('csv_path')
+    parser.add_argument('feat_x')
+    parser.add_argument('feat_y')
+    parser.add_argument('output_dir')
+    parser.add_argument('--n_pages', type=int, default=None,
+                        help='Número máximo de páginas a graficar (por defecto todas)')
+    args = parser.parse_args()
 
-    csv_path   = sys.argv[1]
-    feat_x     = sys.argv[2]
-    feat_y     = sys.argv[3]
-    output_dir = sys.argv[4]
+    csv_path   = args.csv_path
+    feat_x     = args.feat_x
+    feat_y     = args.feat_y
+    output_dir = args.output_dir
 
     if not os.path.isfile(csv_path):
         print(f"[ERROR] CSV no encontrado: {csv_path}")
@@ -229,7 +235,11 @@ def main():
         print("[ERROR] No se encontraron etiquetas pagina_1..pagina_100.")
         sys.exit(1)
 
-    print(f"Páginas: {len(pages)}  |  X={feat_x}  |  Y={feat_y}")
+    if args.n_pages is not None:
+        pages = pages[:args.n_pages]
+        print(f"Limitando a {args.n_pages} páginas (--n_pages)")
+
+    print(f"Páginas a graficar: {len(pages)}  |  X={feat_x}  |  Y={feat_y}")
     print("Calculando rangos limpios (IQR)...")
     stats = compute_stats(df, feat_x, feat_y, pages)
 
@@ -245,8 +255,8 @@ def main():
 
     # ── Figura: cada subplot muestra las 20 páginas de ese grupo ─────────
     fig, axes = plt.subplots(
-        1, n_groups,
-        figsize=(6.5 * n_groups, 7),
+        n_groups, 1,
+        figsize=(7, 6.5 * n_groups),
         facecolor='white'
     )
     if n_groups == 1:
@@ -282,9 +292,10 @@ def main():
         fontfamily='monospace', y=1.03
     )
 
-    plt.tight_layout(w_pad=3.0)
+    plt.tight_layout(h_pad=3.0)
 
-    out = os.path.join(output_dir, f'scatter2d_{feat_x}__{feat_y}.png')
+    suffix = f'_top{len(pages)}' if args.n_pages is not None else ''
+    out = os.path.join(output_dir, f'scatter2d_{feat_x}__{feat_y}{suffix}.png')
     plt.savefig(out, dpi=150, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     plt.close()
