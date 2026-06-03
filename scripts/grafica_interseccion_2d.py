@@ -174,15 +174,15 @@ def plot_group_2d(ax, pages, stats, overlap_flags, feat_x, feat_y, colormap):
         ax.set_ylim(min(all_y) - margin_y, max(all_y) + margin_y)
 
     # ── Estética ──────────────────────────────────────────────────────────
-    ax.set_xlabel(feat_x, fontsize=8, color='#333', labelpad=5)
-    ax.set_ylabel(feat_y, fontsize=8, color='#333', labelpad=5)
+    ax.set_xlabel(feat_x, fontsize=12, color='#111111', labelpad=5)
+    ax.set_ylabel(feat_y, fontsize=12, color='#111111', labelpad=5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_color('#666')
-    ax.spines['bottom'].set_color('#666')
-    ax.tick_params(colors='#444', labelsize=6.5)
+    ax.spines['left'].set_color('#111111')
+    ax.spines['bottom'].set_color('#111111')
+    ax.tick_params(colors='#111111', labelsize=11)
     ax.set_facecolor('white')
-    ax.grid(color='#dddddd', linewidth=0.5, linestyle=':', zorder=0)
+    ax.grid(color='#aaaaaa', linewidth=0.8, linestyle=':', zorder=0)
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(
         lambda v, _: f'{v/1e3:.0f}k' if abs(v) >= 1000 else f'{v:.3g}'))
     ax.yaxis.set_major_formatter(ticker.FuncFormatter(
@@ -280,7 +280,7 @@ def main():
         ax.set_title(
             f'Págs {first_p}–{last_p}   Σ={g_sum}/{len(group)}\n'
             f'{"".join(["1" if overlap_flags[p] else "0" for p in group])}',
-            fontsize=7.5, color='#333', pad=6, loc='center',
+            fontsize=12, color='#111111', pad=6, loc='center',
             fontfamily='monospace'
         )
 
@@ -288,7 +288,7 @@ def main():
     fig.suptitle(
         f'Σ total solapamiento 2D  =  {total_overlap} / {total_pages}  ({pct:.1f} %)'
         f'     [{feat_x}  ×  {feat_y}]',
-        fontsize=11, fontweight='bold', color='#1a1a2e',
+        fontsize=14, fontweight='bold', color='#1a1a2e',
         fontfamily='monospace', y=1.03
     )
 

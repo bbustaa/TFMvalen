@@ -129,17 +129,17 @@ def plot_group(ax, pages, stats, overlap_flags, colormap):
     # Etiquetas eje x
     page_numbers = [int(p.split('_')[1]) for p in pages]
     ax.set_xticks(x_positions)
-    ax.set_xticklabels(page_numbers, fontsize=7)
+    ax.set_xticklabels(page_numbers, fontsize=11, color='#111111')
     ax.set_xlim(0.3, n + 0.7)
 
     # Estética
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_color('#555')
-    ax.spines['bottom'].set_color('#555')
-    ax.tick_params(colors='#333', labelsize=7)
+    ax.spines['left'].set_color('#111111')
+    ax.spines['bottom'].set_color('#111111')
+    ax.tick_params(colors='#111111', labelsize=11)
     ax.set_facecolor('white')
-    ax.grid(axis='y', color='#cccccc', linewidth=0.5, linestyle=':', zorder=0)
+    ax.grid(axis='y', color='#aaaaaa', linewidth=0.8, linestyle=':', zorder=0)
 
     return group_sum
 
@@ -213,15 +213,15 @@ def main():
         g_sum = plot_group(ax, group, stats, overlap_flags, colormap)
         group_sums.append(g_sum)
 
-        ax.set_ylabel(feature, fontsize=8, color='#333', labelpad=6)
-        ax.set_xlabel('página', fontsize=8, color='#333', labelpad=4)
+        ax.set_ylabel(feature, fontsize=12, color='#111111', labelpad=6)
+        ax.set_xlabel('página', fontsize=12, color='#111111', labelpad=4)
 
         first_p = int(group[0].split('_')[1])
         last_p  = int(group[-1].split('_')[1])
         ax.set_title(
             f'Páginas {first_p}–{last_p}   │   '
             f'Σ solapamiento = {g_sum} / {len(group)}',
-            fontsize=8.5, color='#444', pad=5, loc='left',
+            fontsize=12, color='#111111', pad=5, loc='left',
             fontfamily='monospace'
         )
 
@@ -229,7 +229,7 @@ def main():
     pct = 100 * total_overlap / total_pages
     fig.suptitle(
         f'Σ total solapamiento = {total_overlap} / {total_pages}  ({pct:.1f} %)',
-        fontsize=12, fontweight='bold', color='#1a1a2e',
+        fontsize=14, fontweight='bold', color='#1a1a2e',
         fontfamily='monospace', y=1.004
     )
 

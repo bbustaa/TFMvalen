@@ -175,17 +175,17 @@ def plot_group_3d(ax, pages, stats, overlap_flags, fx, fy, fz, colormap):
     ax.xaxis.set_major_formatter(fmt)
     ax.yaxis.set_major_formatter(fmt)
     ax.zaxis.set_major_formatter(fmt)
-    ax.set_xlabel(fx, fontsize=6.5, labelpad=4, color='#333')
-    ax.set_ylabel(fy, fontsize=6.5, labelpad=4, color='#333')
-    ax.set_zlabel(fz, fontsize=6.5, labelpad=4, color='#333')
-    ax.tick_params(labelsize=5.5, colors='#444')
+    ax.set_xlabel(fx, fontsize=12, labelpad=4, color='#111111')
+    ax.set_ylabel(fy, fontsize=12, labelpad=4, color='#111111')
+    ax.set_zlabel(fz, fontsize=12, labelpad=4, color='#111111')
+    ax.tick_params(labelsize=11, colors='#111111')
     ax.xaxis.pane.fill = False
     ax.yaxis.pane.fill = False
     ax.zaxis.pane.fill = False
-    ax.xaxis.pane.set_edgecolor('#cccccc')
-    ax.yaxis.pane.set_edgecolor('#cccccc')
-    ax.zaxis.pane.set_edgecolor('#cccccc')
-    ax.grid(True, color='#dddddd', linewidth=0.4, linestyle=':')
+    ax.xaxis.pane.set_edgecolor('#aaaaaa')
+    ax.yaxis.pane.set_edgecolor('#aaaaaa')
+    ax.zaxis.pane.set_edgecolor('#aaaaaa')
+    ax.grid(True, color='#aaaaaa', linewidth=0.8, linestyle=':')
     ax.set_facecolor('white')
     ax.view_init(elev=22, azim=35)
 
@@ -261,14 +261,14 @@ def main():
         bits    = ''.join('1' if overlap_flags[p] else '0' for p in group)
         ax.set_title(
             f'Págs {first_p}–{last_p}   Σ={g_sum}/{len(group)}\n{bits}',
-            fontsize=7.5, color='#333', pad=6,
+            fontsize=12, color='#111111', pad=6,
             fontfamily='monospace'
         )
 
     fig.suptitle(
         f'Σ total solapamiento 3D  =  {total_overlap} / {total_pages}  ({pct:.1f} %)'
         f'     [{fx}  ×  {fy}  ×  {fz}]',
-        fontsize=11, fontweight='bold', color='#1a1a2e',
+        fontsize=14, fontweight='bold', color='#1a1a2e',
         fontfamily='monospace', y=1.03
     )
 
