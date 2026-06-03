@@ -126,7 +126,7 @@ def plot_group_2d(ax, pages, stats, overlap_flags, feat_x, feat_y, colormap):
         idx_x = np.random.choice(len(s['cx']), n_pts, replace=False)
         idx_y = np.random.choice(len(s['cy']), n_pts, replace=False)
         ax.scatter(s['cx'][idx_x], s['cy'][idx_y],
-                   color=color, alpha=0.35, s=5, linewidths=0, zorder=4)
+                   color=color, alpha=0.35, s=18, linewidths=0, zorder=4)
 
         # Número de página en el centro del rectángulo
         cx_mid = (xmin + xmax) / 2
@@ -181,7 +181,7 @@ def plot_group_2d(ax, pages, stats, overlap_flags, feat_x, feat_y, colormap):
     ax.spines['left'].set_color('#666')
     ax.spines['bottom'].set_color('#666')
     ax.tick_params(colors='#444', labelsize=6.5)
-    ax.set_facecolor('#f8f8f8')
+    ax.set_facecolor('white')
     ax.grid(color='#dddddd', linewidth=0.5, linestyle=':', zorder=0)
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(
         lambda v, _: f'{v/1e3:.0f}k' if abs(v) >= 1000 else f'{v:.3g}'))
@@ -262,7 +262,7 @@ def main():
     if n_groups == 1:
         axes = [axes]
 
-    colormap   = plt.get_cmap('tab20b')
+    colormap   = plt.get_cmap('tab10')
     group_sums = []
 
     for idx, (ax, group) in enumerate(zip(axes, groups)):
@@ -296,7 +296,7 @@ def main():
 
     suffix = f'_top{len(pages)}' if args.n_pages is not None else ''
     out = os.path.join(output_dir, f'scatter2d_{feat_x}__{feat_y}{suffix}.png')
-    plt.savefig(out, dpi=150, bbox_inches='tight',
+    plt.savefig(out, dpi=200, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     plt.close()
 

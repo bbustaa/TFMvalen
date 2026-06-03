@@ -80,13 +80,13 @@ def plot_group(ax, pages, stats, overlap_flags, colormap):
         # Puntos con jitter
         jitter = np.random.uniform(-0.18, 0.18, size=len(vals))
         ax.scatter(xpos + jitter, vals,
-                   color=color, alpha=0.45, s=6, linewidths=0, zorder=2)
+                   color=color, alpha=0.45, s=18, linewidths=0, zorder=2)
 
         # Barras min/max y línea vertical de rango
         ax.hlines(vmin, xpos - 0.3, xpos + 0.3,
-                  colors=color, linewidths=1.8, alpha=0.9, zorder=3)
+                  colors=color, linewidths=2.5, alpha=0.9, zorder=3)
         ax.hlines(vmax, xpos - 0.3, xpos + 0.3,
-                  colors=color, linewidths=1.8, alpha=0.9, zorder=3)
+                  colors=color, linewidths=2.5, alpha=0.9, zorder=3)
         ax.vlines(xpos, vmin, vmax,
                   colors=color, linewidths=0.6, alpha=0.4, zorder=1)
 
@@ -138,7 +138,7 @@ def plot_group(ax, pages, stats, overlap_flags, colormap):
     ax.spines['left'].set_color('#555')
     ax.spines['bottom'].set_color('#555')
     ax.tick_params(colors='#333', labelsize=7)
-    ax.set_facecolor('#f9f9f9')
+    ax.set_facecolor('white')
     ax.grid(axis='y', color='#cccccc', linewidth=0.5, linestyle=':', zorder=0)
 
     return group_sum
@@ -206,7 +206,7 @@ def main():
     if n_groups == 1:
         axes = [axes]
 
-    colormap   = plt.get_cmap('tab20b')
+    colormap   = plt.get_cmap('tab10')
     group_sums = []
 
     for idx, (ax, group) in enumerate(zip(axes, groups)):
@@ -237,7 +237,7 @@ def main():
 
     suffix = f'_top{len(pages)}' if args.n_pages is not None else ''
     output_path = os.path.join(output_dir, f'scatter_{feature}{suffix}.png')
-    plt.savefig(output_path, dpi=150, bbox_inches='tight',
+    plt.savefig(output_path, dpi=200, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     plt.close()
 

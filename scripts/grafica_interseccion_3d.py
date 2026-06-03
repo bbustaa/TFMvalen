@@ -136,7 +136,7 @@ def plot_group_3d(ax, pages, stats, overlap_flags, fx, fy, fz, colormap):
         iy = np.random.choice(len(s['cy']), n_pts, replace=False)
         iz = np.random.choice(len(s['cz']), n_pts, replace=False)
         ax.scatter(s['cx'][ix], s['cy'][iy], s['cz'][iz],
-                   color=color, alpha=0.30, s=4, linewidths=0, zorder=2,
+                   color=color, alpha=0.30, s=18, linewidths=0, zorder=2,
                    depthshade=True)
 
         # Número de página en el centro del cubo
@@ -186,7 +186,7 @@ def plot_group_3d(ax, pages, stats, overlap_flags, fx, fy, fz, colormap):
     ax.yaxis.pane.set_edgecolor('#cccccc')
     ax.zaxis.pane.set_edgecolor('#cccccc')
     ax.grid(True, color='#dddddd', linewidth=0.4, linestyle=':')
-    ax.set_facecolor('#f5f5f5')
+    ax.set_facecolor('white')
     ax.view_init(elev=22, azim=35)
 
     g_sum = sum(int(overlap_flags[p]) for p in pages if overlap_flags[p] is not None)
@@ -247,7 +247,7 @@ def main():
 
     fig = plt.figure(figsize=(8, 7.5 * n_groups), facecolor='white')
 
-    colormap   = plt.get_cmap('tab20b')
+    colormap   = plt.get_cmap('tab10')
     group_sums = []
 
     for idx, group in enumerate(groups):
@@ -276,7 +276,7 @@ def main():
 
     suffix = f'_top{len(pages)}' if args.n_pages is not None else ''
     out = os.path.join(output_dir, f'scatter3d_{fx}__{fy}__{fz}{suffix}.png')
-    plt.savefig(out, dpi=150, bbox_inches='tight',
+    plt.savefig(out, dpi=200, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     plt.close()
 
