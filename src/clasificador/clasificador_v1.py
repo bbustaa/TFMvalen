@@ -16,7 +16,7 @@ def clasificadorCW(csv_path: str, n_train: int, seed: int) -> dict:
     # cada fila contiene una muestra correspondiente a una captura
     
     # validación del parámetro
-    if not (1 <= n_train <= 99):
+    if not (0 <= n_train <= 100):
         raise ValueError("n_train debe estar entre 1 y 99 (inclusive)")
     
     df = pd.read_csv(csv_path)
