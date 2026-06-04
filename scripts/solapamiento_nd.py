@@ -129,12 +129,14 @@ def main():
             print(f"La feature '{feature}' no existe en el CSV.")
             sys.exit(1)
 
-    all_pages = [f"pagina_{i}" for i in range(1, 101)]
-    existing = set(df["label"].unique())
-    pages = [p for p in all_pages if p in existing]
+    #all_pages = [f"pagina_{i}" for i in range(1, 101)]
+    #existing = set(df["label"].unique())
+    #pages = [p for p in all_pages if p in existing]
+    
+    pages = sorted(df["label"].unique().tolist())
 
     if len(pages) == 0:
-        print("[ERROR] No se encontraron etiquetas pagina_1..pagina_100 en el CSV.")
+        print("No se encontró etiqueta.")
         sys.exit(1)
 
     print(f"Páginas encontradas: {len(pages)}")

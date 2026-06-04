@@ -1,0 +1,113 @@
+Resumen de solapamiento N-dimensional
+=====================================
+
+CSV: datos/escenario3/percentil25/features.csv
+Nº de features: 3
+Features usadas: feature_5, feature_4, feature_24
+
+Páginas analizadas: 100
+Páginas con solapamiento: 98 / 100
+Porcentaje de solapamiento: 98.00 %
+Nº de pares solapados: 1385
+
+Flags por página:
+pagina_1: 1
+pagina_2: 1
+pagina_3: 1
+pagina_4: 1
+pagina_5: 1
+pagina_6: 1
+pagina_7: 1
+pagina_8: 1
+pagina_9: 1
+pagina_10: 1
+pagina_11: 1
+pagina_12: 1
+pagina_13: 0
+pagina_14: 1
+pagina_15: 1
+pagina_16: 1
+pagina_17: 1
+pagina_18: 1
+pagina_19: 1
+pagina_20: 1
+pagina_21: 1
+pagina_22: 1
+pagina_23: 1
+pagina_24: 1
+pagina_25: 1
+pagina_26: 1
+pagina_27: 1
+pagina_28: 1
+pagina_29: 1
+pagina_30: 1
+pagina_31: 1
+pagina_32: 1
+pagina_33: 1
+pagina_34: 1
+pagina_35: 1
+pagina_36: 1
+pagina_37: 1
+pagina_38: 1
+pagina_39: 1
+pagina_40: 1
+pagina_41: 1
+pagina_42: 1
+pagina_43: 1
+pagina_44: 1
+pagina_45: 1
+pagina_46: 1
+pagina_47: 1
+pagina_48: 1
+pagina_49: 1
+pagina_50: 1
+pagina_51: 1
+pagina_52: 1
+pagina_53: 1
+pagina_54: 1
+pagina_55: 1
+pagina_56: 1
+pagina_57: 1
+pagina_58: 1
+pagina_59: 1
+pagina_60: 1
+pagina_61: 1
+pagina_62: 1
+pagina_63: 1
+pagina_64: 1
+pagina_65: 1
+pagina_66: 1
+pagina_67: 1
+pagina_68: 1
+pagina_69: 1
+pagina_70: 1
+pagina_71: 1
+pagina_72: 1
+pagina_73: 1
+pagina_74: 1
+pagina_75: 1
+pagina_76: 1
+pagina_77: 1
+pagina_78: 1
+pagina_79: 1
+pagina_80: 1
+pagina_81: 1
+pagina_82: 1
+pagina_83: 1
+pagina_84: 1
+pagina_85: 1
+pagina_86: 1
+pagina_87: 1
+pagina_88: 1
+pagina_89: 1
+pagina_90: 1
+pagina_91: 1
+pagina_92: 1
+pagina_93: 1
+pagina_94: 1
+pagina_95: 1
+pagina_96: 1
+pagina_97: 1
+pagina_98: 1
+pagina_99: 0
+pagina_100: 1

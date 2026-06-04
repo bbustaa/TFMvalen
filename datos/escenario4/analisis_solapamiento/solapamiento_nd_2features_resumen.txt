@@ -1,0 +1,77 @@
+Resumen de solapamiento N-dimensional
+=====================================
+
+CSV: datos/escenario4/features_OW.csv
+Nº de features: 2
+Features usadas: feature_1, feature_18573
+
+Páginas analizadas: 64
+Páginas con solapamiento: 62 / 64
+Porcentaje de solapamiento: 96.88 %
+Nº de pares solapados: 106
+
+Flags por página:
+adobe.com: 1
+amazon.com: 1
+apple.com: 1
+azure.com: 1
+baidu.com: 1
+bing.com: 1
+blogspot.com: 1
+dropbox.com: 1
+dzen.ru: 1
+epicgames.com: 1
+europa.eu: 1
+facebook.com: 1
+flickr.com: 1
+github.com: 1
+github.io: 1
+google.com: 1
+icloud.com: 1
+instagram.com: 1
+intuit.com: 1
+linkedin.com: 1
+live.com: 1
+mail.ru: 1
+microsoft.com: 1
+mozilla.org: 1
+msn.com: 1
+mts.ru: 1
+netflix.com: 1
+nih.gov: 1
+nist.gov: 1
+nytimes.com: 1
+office.com: 1
+office365.com: 1
+opera.com: 1
+outlook.com: 1
+pinterest.com: 1
+qq.com: 1
+reddit.com: 1
+roblox.com: 1
+samsung.com: 1
+sharepoint.com: 1
+skype.com: 1
+snapchat.com: 1
+spotify.com: 0
+t-online.de: 1
+t.me: 1
+telekom.de: 1
+tiktok.com: 1
+tumblr.com: 1
+twitter.com: 1
+unity3d.com: 0
+vimeo.com: 1
+vk.com: 1
+whatsapp.com: 1
+whatsapp.net: 1
+wikipedia.org: 1
+windows.com: 1
+wordpress.com: 1
+wordpress.org: 1
+x.com: 1
+xiaomi.com: 1
+yahoo.com: 1
+youtu.be: 1
+youtube.com: 1
+zoom.us: 1
