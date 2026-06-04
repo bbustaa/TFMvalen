@@ -1,7 +1,0 @@
-Resumen de solapamientos — Feature: feature_5
-Tolerancia: 0.0
-Total coincidencias: 0
-Pares de páginas con solapamiento: 0
-
-Par de páginas                            Solapamientos
---------------------------------------------------------
