@@ -250,17 +250,19 @@ def main():
     pct           = 100 * total_overlap / total_pages
     print(f"  → Páginas con solapamiento 2D: {total_overlap} / {total_pages}  ({pct:.1f} %)")
 
-    groups   = [pages[i:i+20] for i in range(0, len(pages), 20)]
+    groups   = [pages[i:i+25] for i in range(0, len(pages), 25)]
     n_groups = len(groups)
+    n_cols   = 2
+    n_rows   = (n_groups + 1) // 2
 
-    # ── Figura: cada subplot muestra las 20 páginas de ese grupo ─────────
     fig, axes = plt.subplots(
-        n_groups, 1,
-        figsize=(7, 6.5 * n_groups),
+        n_rows, n_cols,
+        figsize=(14, 6.5 * n_rows),
         facecolor='white'
     )
-    if n_groups == 1:
-        axes = [axes]
+    axes = np.array(axes).flatten()
+    for ax in axes[n_groups:]:
+        ax.set_visible(False)
 
     colormap   = plt.get_cmap('tab10')
     group_sums = []
@@ -292,7 +294,7 @@ def main():
         fontfamily='monospace', y=1.03
     )
 
-    plt.tight_layout(h_pad=3.0)
+    plt.tight_layout(h_pad=3.0, w_pad=2.0)
 
     suffix = f'_top{len(pages)}' if args.n_pages is not None else ''
     out = os.path.join(output_dir, f'scatter2d_{feat_x}__{feat_y}{suffix}.png')

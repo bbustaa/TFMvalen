@@ -242,16 +242,18 @@ def main():
     pct           = 100 * total_overlap / total_pages
     print(f"  → Páginas con solapamiento 3D: {total_overlap} / {total_pages}  ({pct:.1f} %)")
 
-    groups   = [pages[i:i+20] for i in range(0, len(pages), 20)]
+    groups   = [pages[i:i+25] for i in range(0, len(pages), 25)]
     n_groups = len(groups)
+    n_cols   = 2
+    n_rows   = (n_groups + 1) // 2
 
-    fig = plt.figure(figsize=(8, 7.5 * n_groups), facecolor='white')
+    fig = plt.figure(figsize=(16, 7.5 * n_rows), facecolor='white')
 
     colormap   = plt.get_cmap('tab10')
     group_sums = []
 
     for idx, group in enumerate(groups):
-        ax = fig.add_subplot(n_groups, 1, idx+1, projection='3d')
+        ax = fig.add_subplot(n_rows, n_cols, idx+1, projection='3d')
         g_sum = plot_group_3d(ax, group, stats, overlap_flags,
                               fx, fy, fz, colormap)
         group_sums.append(g_sum)
@@ -272,7 +274,7 @@ def main():
         fontfamily='monospace', y=1.03
     )
 
-    plt.tight_layout(h_pad=2.5)
+    plt.tight_layout(h_pad=2.5, w_pad=2.0)
 
     suffix = f'_top{len(pages)}' if args.n_pages is not None else ''
     out = os.path.join(output_dir, f'scatter3d_{fx}__{fy}__{fz}{suffix}.png')
