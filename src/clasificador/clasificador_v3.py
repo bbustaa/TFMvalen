@@ -23,7 +23,6 @@ MAX_DEPTH    = 50   # profundidad máxima de cada árbol
 
 
 def clasificadorCW(csv_path: str, n_train: int, seed: int, top_n: int) -> dict:
-    # ── Carga del CSV ──────────────────────────────────────────────────────────
     # Cada fila contiene una muestra correspondiente a una captura PCAP.
     if not (1 <= n_train <= 99):
         raise ValueError("n_train debe estar entre 1 y 99 (inclusive)")
@@ -32,7 +31,6 @@ def clasificadorCW(csv_path: str, n_train: int, seed: int, top_n: int) -> dict:
 
     df = pd.read_csv(csv_path)
 
-    # ── División estratificada train / test ────────────────────────────────────
     # Se realiza de forma independiente dentro de cada clase para garantizar
     # que todas las clases estén representadas proporcionalmente en ambos conjuntos.
     train_idx = []
@@ -104,7 +102,6 @@ def clasificadorCW(csv_path: str, n_train: int, seed: int, top_n: int) -> dict:
     )
     clf.fit(X_train_top, y_train)
 
-    # ── Evaluación ────────────────────────────────────────────────────────────
     y_pred   = clf.predict(X_test_top)
     acc      = accuracy_score(y_test, y_pred)
     aciertos = (y_pred == y_test).sum()
@@ -112,18 +109,19 @@ def clasificadorCW(csv_path: str, n_train: int, seed: int, top_n: int) -> dict:
     labels = sorted(y_test.unique())
     cm     = confusion_matrix(y_test, y_pred, labels=labels)
 
-    # ── Top 20 features más importantes del modelo final ─────────────────────
     n_top20 = min(20, len(top_features))
     importancias   = pd.Series(clf.feature_importances_, index=X_train_top.columns)
     top20          = importancias.sort_values(ascending=False).head(n_top20)
     valores_medios = X_test_top.mean()
+    valores_std    = X_test_top.std()
 
     tabla_top20 = pd.DataFrame({
-        "ranking":     range(1, len(top20) + 1),
-        "feature":     top20.index,
-        "Valor medio": [valores_medios[f] for f in top20.index],
-        "descripcion": [nombre_feature(f) for f in top20.index],
-        "importancia": top20.values,
+        "ranking":      range(1, len(top20) + 1),
+        "feature":      top20.index,
+        "Valor medio":  [valores_medios[f] for f in top20.index],
+        "Desv. típica": [valores_std[f]    for f in top20.index],
+        "descripcion":  [nombre_feature(f) for f in top20.index],
+        "importancia":  top20.values,
     })
 
     resultados = {
@@ -167,14 +165,15 @@ def guardar_resultados(resultados: dict, output_path: str) -> None:
             f.write("  " + " ".join(f"{num:5d}" for num in row) + "\n")
         f.write(f"\nTop {min(20, resultados['top_n'])} features más importantes (modelo final):\n")
         tabla = resultados["tabla_top20_features"]
-        f.write(f"{'Rank':<6}{'Feature':<18}{'Descripción':<40}{'Valor medio':<18}{'Importancia':>14}\n")
-        f.write("-" * 110 + "\n")
+        f.write(f"{'Rank':<6}{'Feature':<18}{'Descripción':<40}{'Valor medio':<18}{'Desv. típica':<18}{'Importancia':>14}\n")
+        f.write("-" * 128 + "\n")
         for _, row in tabla.iterrows():
             f.write(
                 f"{row['ranking']:<6} "
                 f"{row['feature']:<18} "
                 f"{row['descripcion']:<40} "
                 f"{row['Valor medio']:<18.4f} "
+                f"{row['Desv. típica']:<18.4f} "
                 f"{row['importancia']:>14.6f}\n"
             )
 
