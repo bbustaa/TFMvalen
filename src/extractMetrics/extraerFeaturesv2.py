@@ -86,7 +86,7 @@ def _burst_stats(valores: list) -> tuple:
     )
 
 
-def nombrarFichero(
+def nombrarEtiqueta(
     pcap_file: str,
     mapeo: dict[str, str] | None = None,
     monitored_domains: set[str] | None = None,
@@ -144,7 +144,7 @@ def procesarDirectorio(
 
         for i, nombre in enumerate(pcaps):
             pcap_path = os.path.join(directorio, nombre)
-            etiqueta = nombrarFichero(nombre, mapeo, monitored_domains)
+            etiqueta = nombrarEtiqueta(nombre, mapeo, monitored_domains)
             print(f"[{i+1}/{len(pcaps)}] {nombre}  →  label: '{etiqueta}'", end="", flush=True)
             try:
                 # única llamada a tshark por pcap
