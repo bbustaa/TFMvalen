@@ -1,3 +1,7 @@
+# PRIMERA VERSIÓN DEL CLASIFICADOR --> LA QUE ES FIEL AL MÉTODO 
+# REPLICADO ES LA v2
+# MÁS QUE TODO TOMA DE CONTACTO
+
 import os
 import pandas as pd
 import numpy as np
