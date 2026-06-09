@@ -1,10 +1,13 @@
+# FUNCIÓN DE EXTRACCIÓN DE MÉTRICAS SEPARADA POR MÓDULOS --> 
+# A DIFERENCIA DE LA v1, ESTE NO CALCULA LAS MÉTRICAS EN UN SOLO SITIO
+
 import csv
 import os
 import sys
 import statistics
 import argparse
 from datetime import datetime
-from mapeo_pcaps_OW import cargar_mapeo_pcaps, cargar_dominios_monitorizados
+from mapeo_pcaps_dominio import cargar_mapeo_pcaps, cargar_dominios_monitorizados
 
 # Añadimos featuresH2C al path para poder importar los módulos
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'featuresH2C'))
@@ -16,7 +19,7 @@ import c_NumDiffSizes
 import d_Top20Sizes
 import e_SizeDist
 
-def extraer_todas_las_features_OW(
+def extraer_todas_las_features(
     frames: list,
     client_ip: str,
     server_ip: str,
@@ -83,19 +86,17 @@ def _burst_stats(valores: list) -> tuple:
     )
 
 
-def nombrarFicheroOW(
+def nombrarFichero(
     pcap_file: str,
     mapeo: dict[str, str] | None = None,
     monitored_domains: set[str] | None = None,
 ) -> str:
     """
-    Devuelve la etiqueta de un pcap para el escenario Open World.
-
     - Si se proporciona mapeo ({basename_pcap: dominio}) se usa el dominio
       real como etiqueta.
     - Si monitored_domains no es None, los dominios que NO estén en él
       se etiquetan como 'unknown'.
-    - Si no hay mapeo disponible se cae al convenio de nombre CW:
+    - Si no hay mapeo disponible se cae al convenio de nombre de los escenarios de lab:
       captura_<bloque>_<N>.pcap → pagina_<N>
     """
     basename = os.path.basename(pcap_file)
@@ -108,7 +109,7 @@ def nombrarFicheroOW(
             return "unknown"
         return dominio
 
-    # fallback: convenio de nombre Closed World
+    # fallback: convenio de nombre de los escenarios de lab
     nombre = os.path.splitext(basename)[0]
     partes = nombre.split("_")
     bloque = partes[1]
@@ -118,7 +119,7 @@ def nombrarFicheroOW(
     return f"pagina_{pagina}"
 
 
-def procesarDirectorioOW(
+def procesarDirectorio(
     directorio: str,
     client_ip: str,
     server_ip: str,
@@ -143,19 +144,19 @@ def procesarDirectorioOW(
 
         for i, nombre in enumerate(pcaps):
             pcap_path = os.path.join(directorio, nombre)
-            etiqueta = nombrarFicheroOW(nombre, mapeo, monitored_domains)
+            etiqueta = nombrarFichero(nombre, mapeo, monitored_domains)
             print(f"[{i+1}/{len(pcaps)}] {nombre}  →  label: '{etiqueta}'", end="", flush=True)
             try:
                 # única llamada a tshark por pcap
                 frames = a_ConnStats.extraer_frames_tls(pcap_path)
-                vector = extraer_todas_las_features_OW(
+                vector = extraer_todas_las_features(
                     frames=frames,
                     client_ip=client_ip,
                     server_ip=server_ip,
                     server_port=server_port,
                 )
                 writer.writerow([etiqueta] + vector)
-                print("  ✓")
+                print("✓")
             except Exception as e:
                 print(f"\nError procesando {nombre}: {e}")
                 errores.append((nombre, str(e)))
@@ -165,12 +166,12 @@ def procesarDirectorioOW(
         print(f"Ficheros con errores: {errores}")
 
 if __name__ == "__main__":
-    client_ip = "10.6.56.13"
+    client_ip = "10.6.56.13"  # IP configurable según IP cliente
     server_ip = ""
     server_port = 443
 
     parser = argparse.ArgumentParser(
-        description="Extrae features H2Classifier para escenario Open World"
+        description="Extrae features H2Classifier"
     )
     parser.add_argument(
         "directorio",
@@ -196,9 +197,9 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    from mapeo_pcaps_OW import cargar_mapeo_simple
+    from mapeo_pcaps_dominio import cargar_mapeo_simple
     mapeo = cargar_mapeo_simple(args.mapeo) if args.mapeo else None
-    from mapeo_pcaps_OW import cargar_dominios_monitorizados_simple
+    from mapeo_pcaps_dominio import cargar_dominios_monitorizados_simple
     monitored_domains = cargar_dominios_monitorizados_simple(args.monitored) if args.monitored else None
 
     output_path = args.output
@@ -206,7 +207,7 @@ if __name__ == "__main__":
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_path = os.path.join(args.directorio, f"features_OW_{timestamp}.csv")
 
-    procesarDirectorioOW(
+    procesarDirectorio(
         directorio=args.directorio,
         client_ip=client_ip,
         server_ip=server_ip,

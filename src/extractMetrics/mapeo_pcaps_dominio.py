@@ -1,10 +1,3 @@
-## Genera el mapeo {basename_pcap -> dominio_web} a partir del fichero txt
-## de metadatos del escenario Open World.
-## <pageNum> <ID> <URL> intento <attemptNum> <pcap_path> <sslkey_path>
-## Uso directo:
-##  python mapeo_pcaps_OW.py metadatos_OW.txt
-##  python mapeo_pcaps_OW.py metadatos_OW.txt --output mapeo.json
-
 import argparse
 import json
 import os
@@ -109,22 +102,6 @@ def cargar_mapeo_simple(txt_path: str) -> dict[str, str]:
             if len(partes) >= 2:
                 mapeo[partes[0]] = partes[1]
     return mapeo
-
-def cargar_dominios_monitorizados_simple(fichero: str) -> set[str]:
-    """Lee fichero con formato: <ID> <URL> (ej: '1 https://google.com')"""
-    dominios: set[str] = set()
-    with open(fichero, "r", encoding="utf-8") as f:
-        for linea in f:
-            linea = linea.strip()
-            if not linea or linea.startswith("#"):
-                continue
-            partes = linea.split()
-            # buscar la parte que sea una URL
-            for parte in partes:
-                if "://" in parte:
-                    dominios.add(_extraer_dominio(parte))
-                    break
-    return dominios
 
 def cargar_dominios_monitorizados_simple(fichero: str) -> set[str]:
     """Lee fichero con formato: <ID> <URL> (ej: '1 https://google.com')"""

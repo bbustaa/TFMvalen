@@ -138,13 +138,13 @@ python src/extractMetrics/extraerFeaturesOW.py \
 
 ---
 
-#### `mapeo_pcaps_OW.py` — Generador de mapeo PCAP→dominio
+#### `mapeo_pcaps_dominio.py` — Generador de mapeo PCAP→dominio
 
 Lee un fichero de metadatos de captura y genera un JSON con la correspondencia entre cada archivo PCAP y el dominio web al que pertenece.
 
 **Ejecución:**
 ```bash
-python src/extractMetrics/mapeo_pcaps_OW.py \
+python src/extractMetrics/mapeo_pcaps_dominio.py \
     metadata.txt \
     --output mapeo_dominios.json
 ```

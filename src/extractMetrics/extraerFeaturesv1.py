@@ -1,3 +1,6 @@
+# PRIMERA VERSIÓN DEL CÓDIGO DE EXTRACCIÓN DEE MÉTRICAS
+# SE HACE TODO EN UN MISMO FICHERO
+
 import csv
 import subprocess
 import statistics
