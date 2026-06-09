@@ -96,3 +96,48 @@ if __name__ == "__main__":
 
     if args.output:
         guardar_mapeo_json(mapeo, args.output)
+
+def cargar_mapeo_simple(txt_path: str) -> dict[str, str]:
+    """Lee un fichero con formato: basename_pcap<TAB>dominio"""
+    mapeo: dict[str, str] = {}
+    with open(txt_path, "r") as f:
+        for linea in f:
+            linea = linea.strip()
+            if not linea:
+                continue
+            partes = linea.split()
+            if len(partes) >= 2:
+                mapeo[partes[0]] = partes[1]
+    return mapeo
+
+def cargar_dominios_monitorizados_simple(fichero: str) -> set[str]:
+    """Lee fichero con formato: <ID> <URL> (ej: '1 https://google.com')"""
+    dominios: set[str] = set()
+    with open(fichero, "r", encoding="utf-8") as f:
+        for linea in f:
+            linea = linea.strip()
+            if not linea or linea.startswith("#"):
+                continue
+            partes = linea.split()
+            # buscar la parte que sea una URL
+            for parte in partes:
+                if "://" in parte:
+                    dominios.add(_extraer_dominio(parte))
+                    break
+    return dominios
+
+def cargar_dominios_monitorizados_simple(fichero: str) -> set[str]:
+    """Lee fichero con formato: <ID> <URL> (ej: '1 https://google.com')"""
+    dominios: set[str] = set()
+    with open(fichero, "r", encoding="utf-8") as f:
+        for linea in f:
+            linea = linea.strip()
+            if not linea or linea.startswith("#"):
+                continue
+            partes = linea.split()
+            # buscar la parte que sea una URL
+            for parte in partes:
+                if "://" in parte:
+                    dominios.add(_extraer_dominio(parte))
+                    break
+    return dominios

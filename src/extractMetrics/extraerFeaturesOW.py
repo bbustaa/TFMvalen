@@ -196,8 +196,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    mapeo = cargar_mapeo_pcaps(args.mapeo) if args.mapeo else None
-    monitored_domains = cargar_dominios_monitorizados(args.monitored) if args.monitored else None
+    from mapeo_pcaps_OW import cargar_mapeo_simple
+    mapeo = cargar_mapeo_simple(args.mapeo) if args.mapeo else None
+    from mapeo_pcaps_OW import cargar_dominios_monitorizados_simple
+    monitored_domains = cargar_dominios_monitorizados_simple(args.monitored) if args.monitored else None
 
     output_path = args.output
     if not output_path:
